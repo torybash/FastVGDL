@@ -51,22 +51,25 @@ import ontology.sprites.producer.SpriteProducer;
 import tools.IO;
 import tools.Utils;
 import core.game.Game;
+import ontology.termination.MultiSpriteCounter;
+import ontology.termination.SpriteCounter;
 
 public class VGDLParser {
 
-	public int currentSet;
-	
+	int currentSet;
+	int currID = 0;
+        
 	public int amountOfSpriteIDs = -1;
-	ArrayList<SpriteDefinition> spritesDefinitions = new ArrayList<SpriteDefinition>();
 	SpriteDefinition wallDefintion = null;
 	SpriteDefinition avatarDefinition = null;
+        
 
-	ArrayList<Interaction> interacts = new ArrayList<Interaction>();
-	ArrayList<Termination> terms = new ArrayList<Termination>();
+       
+//        ArrayList<SpriteDefinition> spritesDefinitions = new ArrayList<SpriteDefinition>();
+//	ArrayList<Termination> terms = new ArrayList<Termination>();
+//	ArrayList<Interaction> interactions = null;
 	
-	ArrayList<Interaction> interactions = null;
-	
-	HashMap<Character, ArrayList<SpriteDefinition>> mappings = new HashMap<Character, ArrayList<SpriteDefinition>>();
+	HashMap<Character, ArrayList<SpriteDefinition>> currentGameMappings = new HashMap<Character, ArrayList<SpriteDefinition>>();
 	
 	static VGDLParser parser = null;
 	
@@ -91,36 +94,35 @@ public class VGDLParser {
     
     public Game parseGame(String gamedesc_file){
     	Game game = new Game();
-    	
+
+        game.gamePath = gamedesc_file;
+                
         String[] desc_lines = new IO().readFile(gamedesc_file);
         
-        ArrayList[] elements = new ArrayList[4];
+        ArrayList<SpriteDefinition> spriteDefinitions = null;
+        ArrayList<Interaction> interactions = null;
+        ArrayList<Termination> terminations = null;
         
         if(desc_lines != null)
         {
             Node rootNode = indentTreeParser(desc_lines);
 
-            
-            //Parse here game and arguments of the first line
-//            game = VGDLFactory.GetInstance().createGame((GameContent) rootNode.content);
-
-            //Parse here blocks of VGDL.
+            //Parse blocks of VGDL.
             for(Node n : rootNode.children)
             {
                 if(n.identifier.equals("SpriteSet"))
                 {
-                	parseSpriteSet(n.children);
+                    spriteDefinitions = parseSpriteSet(n.children, true);
                 	
                 }else if(n.identifier.equals("InteractionSet"))
                 {
-            
-                    parseInteractionSet(n.children);
+                    interactions = parseInteractionSet(n.children, spriteDefinitions);
                 }else if(n.identifier.equals("LevelMapping"))
                 {
-                    parseLevelMapping(n.children);
+                    parseLevelMapping(n.children, spriteDefinitions);
                 }else if(n.identifier.equals("TerminationSet"))
                 {
-                    parseTerminationSet(n.children);
+                    terminations = parseTerminationSet(n.children);
                 }
             }
         }
@@ -129,7 +131,7 @@ public class VGDLParser {
         System.out.println("DONE PARSING");
         System.out.println("amountOfSpriteIDs: " + amountOfSpriteIDs);
         
-        game.initialize(spritesDefinitions, interactions, terms, amountOfSpriteIDs);
+        game.initialize(spriteDefinitions, interactions, terminations, amountOfSpriteIDs);
         
         return game;
     }
@@ -139,7 +141,7 @@ public class VGDLParser {
 
 
 
-	private Node indentTreeParser(String[] lines)
+	public Node indentTreeParser(String[] lines)
     {
         //By default, let's make tab as four spaces
         String tabTemplate = "    ";
@@ -189,15 +191,15 @@ public class VGDLParser {
      * Parses the sprite set, and then initializes the game structures for the sprites.
      * @param spriteNodes children of the root node of the game description sprite set.
      */
-    private void parseSpriteSet(ArrayList<Node> spriteNodes)
+    public ArrayList<SpriteDefinition> parseSpriteSet(ArrayList<Node> spriteNodes, boolean registerSprites)
     {
-
+        ArrayList<SpriteDefinition> spriteDefinitions = new ArrayList<SpriteDefinition>();
        
-        _parseSprites(spriteNodes, null);
+        _parseSprites(spriteNodes, null, spriteDefinitions);
 
     	//Check for avatar - make one if don't exist
         boolean hasAvatar = false;
-    	for (SpriteDefinition sd : spritesDefinitions) {
+    	for (SpriteDefinition sd : spriteDefinitions) {
     		if (!sd.leafNode) continue;
     		if (sd.spriteClass.getSimpleName().contains("vatar")){
     			hasAvatar = true;
@@ -207,50 +209,58 @@ public class VGDLParser {
     	}
     	if (!hasAvatar){
     		avatarDefinition = new SpriteDefinition("avatar");
-    		spritesDefinitions.add(avatarDefinition);
+    		spriteDefinitions.add(avatarDefinition);
     	}
     	
     	
     	//Make wall
     	wallDefintion = new SpriteDefinition("wall");
-    	spritesDefinitions.add(wallDefintion);
+    	spriteDefinitions.add(wallDefintion);
         
     	
     	//Set IDs
-    	setSpriteIDs(spriteNodes, hasAvatar);
+    	setSpriteIDs(spriteNodes, hasAvatar, spriteDefinitions);
 
         //Register all spriteDefinitions
-        for (SpriteDefinition sd : spritesDefinitions) {
-        	VGDLRegistry.GetInstance().registerSprite(sd);
-		}
+        if (registerSprites){
+            for (SpriteDefinition sd : spriteDefinitions) {
+                VGDLRegistry.GetInstance().registerSprite(sd);
+            }
+        }
         
+        for (SpriteDefinition sd : spriteDefinitions) {
+            System.out.println(sd);
+        }
+
+        return spriteDefinitions;
     }
     
     
-    private void setSpriteIDs(ArrayList<Node> spriteNodes, boolean hasAvatar){
+    private void setSpriteIDs(ArrayList<Node> spriteNodes, boolean hasAvatar, ArrayList<SpriteDefinition> spriteDefinitions){
     	
-    	_setSpriteIDs(spriteNodes);
+        System.out.println("amountOfSpriteIDs: " + amountOfSpriteIDs);
+        
+    	_setSpriteIDs(spriteNodes, spriteDefinitions);
     	
-    	SpriteDefinition wallSd = spritesDefinitions.get(spritesDefinitions.size()-1);
+    	SpriteDefinition wallSd = spriteDefinitions.get(spriteDefinitions.size()-1);
     	wallSd.id = 0;
     	
     	if (!hasAvatar){ //avatar was generated, so ID need to be generated as well
-    		SpriteDefinition avatarSd = spritesDefinitions.get(spritesDefinitions.size()-2);
+    		SpriteDefinition avatarSd = spriteDefinitions.get(spriteDefinitions.size()-2);
     		avatarSd.id = ++currID;
     	}
     	
     	amountOfSpriteIDs = ++currID;
     }
     
-    int currID = 0;
-    private void _setSpriteIDs(ArrayList<Node> spriteNodes){
+    private void _setSpriteIDs(ArrayList<Node> spriteNodes, ArrayList<SpriteDefinition> spriteDefinitions){
     	for (Node n : spriteNodes) {	
     		n.id = ++currID;
     		
 			if (n.children.size() == 0){ //leaf node
 				String spriteName = n.identifier;
 
-				for (SpriteDefinition sd : spritesDefinitions) {
+				for (SpriteDefinition sd : spriteDefinitions) {
 					if (spriteName.equals(sd.spriteName)){
 						sd.id = n.id;
 						if (sd.depth > 0){
@@ -274,25 +284,25 @@ public class VGDLParser {
 			}else{
 				String spriteName = n.identifier;
 				
-				for (SpriteDefinition sd : spritesDefinitions) {
+				for (SpriteDefinition sd : spriteDefinitions) {
 					if (spriteName.equals(sd.spriteName)){
 						sd.id = n.id;
 					}
 				}
-				_setSpriteIDs(n.children);
+				_setSpriteIDs(n.children, spriteDefinitions);
 			}
 		}
     }
 
-    private void _parseSprites(ArrayList<Node> spriteNodes, SpriteDefinition parentDef){
+    private void _parseSprites(ArrayList<Node> spriteNodes, SpriteDefinition parentDef, ArrayList<SpriteDefinition> spriteDefinitions){
     	for (Node n : spriteNodes) {	
 			if (n.children.size() == 0){ //leaf node
 				SpriteDefinition sd = new SpriteDefinition(n, true, parentDef);
-				spritesDefinitions.add(sd);
+				spriteDefinitions.add(sd);
 			}else{
 				SpriteDefinition sd = new SpriteDefinition(n, false, parentDef);
-				spritesDefinitions.add(sd);
-				_parseSprites(n.children, sd);
+				spriteDefinitions.add(sd);
+				_parseSprites(n.children, sd, spriteDefinitions);
 			}
 		}
     }
@@ -312,8 +322,10 @@ public class VGDLParser {
      * Parses the interaction set.
      * @param elements all interactions defined for the game.
      */
-    private void parseInteractionSet(ArrayList<Node> elements){
-    	interactions = new ArrayList<Interaction>();
+    public ArrayList<Interaction> parseInteractionSet(ArrayList<Node> elements, ArrayList<SpriteDefinition> spriteDefinitions){
+    	
+        
+        ArrayList<Interaction> interactions = new ArrayList<Interaction>();
     	
         for(Node n : elements){
             Interaction inter = VGDLFactory.GetInstance().makeInteraction(n);
@@ -324,29 +336,25 @@ public class VGDLParser {
         	String sprite2name = pieces[1];
         	int sprite1Id = -1;
         	int sprite2Id = -1;
-        	for (SpriteDefinition sd : spritesDefinitions) {
-				if (sd.spriteName.equals(sprite1name)) sprite1Id = sd.id;
-				if (sd.spriteName.equals(sprite2name))  sprite2Id = sd.id;
-			}
+        	for (SpriteDefinition sd : spriteDefinitions) {
+                    if (sd.spriteName.equals(sprite1name)) sprite1Id = sd.id;
+                    if (sd.spriteName.equals(sprite2name))  sprite2Id = sd.id;
+                }
         	
         	inter.id1 = sprite1Id;
         	inter.id2 = sprite2Id;
-//        	if (collisionEffects[sprite1Id][sprite2Id] == null) collisionEffects[sprite1Id][sprite2Id] = new ArrayList<Interaction>();
         	interactions.add(inter);
         	
-//        	System.out.println(sprite1name + ": " + sprite1Id + ", " + sprite2name + ": " + sprite2Id);
-//        	//Set colllision effect / EOS effect
-//        	if (collisionEffects[sprite1Id * spritesDefinitions.size() + sprite2Id] == null)
-//        		collisionEffects[sprite1Id * spritesDefinitions.size() + sprite2Id] = new ArrayList<Interaction>();
-//			collisionEffects[sprite1Id * spritesDefinitions.size() + sprite2Id].add(inter);
         }
+        
+        return interactions;
     }
 //
 //    /**
 //     * Parses the level mapping.
 //     * @param elements all mapping units.
 //     */
-    private void parseLevelMapping(ArrayList<Node> elements)
+    public void parseLevelMapping(ArrayList<Node> elements, ArrayList<SpriteDefinition> spriteDefinitions)
     {
     	boolean hasMappingForAvatar = false;
         for(Node n : elements)
@@ -365,29 +373,29 @@ public class VGDLParser {
 			ArrayList<SpriteDefinition> sds = new ArrayList<SpriteDefinition>();
         	
         	for (String spriteId : spriteIds) {
-				for (SpriteDefinition sd : spritesDefinitions) {
-					if (sd.spriteName.equals(spriteId)){
-						//Set mapping
-						sds.add(sd);
-						break;
-					}
-				}
-			}
-			mappings.put(chKey, sds);
+                    for (SpriteDefinition sd : spriteDefinitions) {
+                            if (sd.spriteName.equals(spriteId)){
+                                    //Set mapping
+                                    sds.add(sd);
+                                    break;
+                            }
+                    }
+                }
+                currentGameMappings.put(chKey, sds);
         }
 
         //Add wall mapping
         char wallChar = "w".charAt(0);
         ArrayList<SpriteDefinition> wallSds = new ArrayList<SpriteDefinition>();
         wallSds.add(wallDefintion);
-        mappings.put(wallChar, wallSds);
+        currentGameMappings.put(wallChar, wallSds);
         
         //Add avatar mapping (if don't exist)
         if (!hasMappingForAvatar){
             char avatarChar = "A".charAt(0);
             ArrayList<SpriteDefinition> avatarSds = new ArrayList<SpriteDefinition>();
             avatarSds.add(avatarDefinition);
-            mappings.put(avatarChar, avatarSds);
+            currentGameMappings.put(avatarChar, avatarSds);
         }
         
     }
@@ -396,20 +404,21 @@ public class VGDLParser {
      * Parses the termination set.
      * @param elements all terminations defined for the game.
      */
-    private void parseTerminationSet(ArrayList<Node> elements)
+    public ArrayList<Termination> parseTerminationSet(ArrayList<Node> elements)
     {
+        ArrayList<Termination> terminations = new ArrayList<Termination>();
         for(Node n : elements)
         {
-        	Termination t = VGDLFactory.GetInstance().makeTermination(n);
-        	terms.add(t);
+            Termination t = VGDLFactory.GetInstance().makeTermination(n);
+            terminations.add(t);
         }
-
+        return terminations;
     }
 
 
 
 
-	public void parseLevel(Game game, String level_desc) {
+    public void parseLevel(Game game, String level_desc) {
         String[] lines = new IO().readFile(level_desc);
         
         if(lines == null) throw new RuntimeException();
@@ -418,16 +427,104 @@ public class VGDLParser {
        
         
         for (int i = 0; i < lines.length; i++) {
-        	String line = lines[i];
-        	
-        	for (int j = 0; j < line.length(); j++) {
-				char ch = line.charAt(j);
-				if (mappings.get(ch) == null) continue;
-				for (SpriteDefinition sd : mappings.get(ch)){
-					game.addSprite(sd, j, i);
-				}
-			}
-        	
-		}        
-	}
+            String line = lines[i];
+            for (int j = 0; j < line.length(); j++) {
+                char ch = line.charAt(j);
+                if (currentGameMappings.get(ch) == null) continue;
+                for (SpriteDefinition sd : currentGameMappings.get(ch)){
+                    game.addSprite(sd, j, i);
+                }
+            }
+        }        
+    }
+        
+        
+        
+        
+     public int[] getGoalInteraction(String gamePath) {
+        currID = 0;
+        amountOfSpriteIDs = -1;
+         
+        
+         int[] result = new int[2];
+         
+         
+        String[] desc_lines = new IO().readFile(gamePath);
+        
+        ArrayList<SpriteDefinition> spriteDefinitions = null;
+        ArrayList<Interaction> interactions = null;
+        ArrayList<Termination> terminations = null;
+        
+        if(desc_lines != null)
+        {
+            Node rootNode = indentTreeParser(desc_lines);
+
+            //Parse blocks of VGDL.
+            for(Node n : rootNode.children)
+            {
+                if(n.identifier.equals("SpriteSet"))
+                {
+                    spriteDefinitions = parseSpriteSet(n.children, false);
+                	
+                }else if(n.identifier.equals("InteractionSet"))
+                {
+                    interactions = parseInteractionSet(n.children, spriteDefinitions);
+                }else if(n.identifier.equals("LevelMapping"))
+                {
+//                    parseLevelMapping(n.children, spriteDefinitions);
+                }else if(n.identifier.equals("TerminationSet"))
+                {
+                    terminations = parseTerminationSet(n.children);
+                }
+            }
+        }
+        
+        //Find sprite that can cause win
+        int winningSpriteId = -1;
+        boolean goalIsCreatingSprite = false;
+        for (Termination termination : terminations) {
+             if (termination.win){
+                 if (termination.getClass().getSimpleName().equals("SpriteCounter")){
+                     SpriteCounter sc = (SpriteCounter) termination;
+                    
+//                     System.out.println(" sc.itype: " +  sc.itype + " sc.stype: " + sc.stype);
+                     winningSpriteId = sc.itype;
+                     if (termination.limit > 0) goalIsCreatingSprite = true;
+                 }else if (termination.getClass().getSimpleName().equals("MultiSpriteCounter")){
+                    MultiSpriteCounter msc = (MultiSpriteCounter) termination;
+                    
+//                     System.out.println(" sc.itype: " +  sc.itype + " sc.stype: " + sc.stype);
+                    winningSpriteId = msc.itype1;
+                    if (termination.limit > 0) goalIsCreatingSprite = true;
+                 }
+             }
+         }
+         
+         //Check for interaction that can remove/create sprite
+        for (Interaction inter : interactions) {
+            if (inter.id1 != winningSpriteId) continue;
+            
+            String interClassName = inter.getClass().getSimpleName();
+            if (goalIsCreatingSprite){
+                if (interClassName.equals("TransformTo") || interClassName.equals("SpawnIfHasMore")){
+                    result[0] = inter.id1;
+                    result[1] = inter.id2;
+                }
+            }else{
+                if (interClassName.equals("KillIfOtherHasMore") || interClassName.equals("KillIfFromAbove") || interClassName.equals("KillIfHasLess")
+                         || interClassName.equals("KillIfHasMore")  || interClassName.equals("KillSprite")  || interClassName.equals("TransformTo")){
+                    result[0] = inter.id1;
+                    result[1] = inter.id2;
+                }
+            }
+            
+            
+//            if (inter.id1 == winningSpriteId || inter.id2 == winningSpriteId){
+//                
+//            }
+        }
+         
+         System.out.println("result: " + Arrays.toString(result));
+         return result;
+     }
 }

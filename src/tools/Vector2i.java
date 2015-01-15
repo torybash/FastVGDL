@@ -198,23 +198,23 @@ public class Vector2i
 //        return x * v.x + y * v.y;
 //    }
 //
-//    /**
-//     * Gets the square value of the parameter passed.
-//     * @param x parameter
-//     * @return x * x
-//     */
-//    public static double sqr(double x) {
-//        return x * x;
-//    }
-//
-//    /**
-//     * Returns the square distance from this vector to the one in the arguments.
-//     * @param v the other vector, to calculate the distance to.
-//     * @return the square distance, in pixels, between this vector and v.
-//     */
-//    public double sqDist(Vector2i v) {
-//        return sqr(x - v.x) + sqr(y - v.y);
-//    }
+    /**
+     * Gets the square value of the parameter passed.
+     * @param x parameter
+     * @return x * x
+     */
+    public static double sqr(double x) {
+        return x * x;
+    }
+
+    /**
+     * Returns the square distance from this vector to the one in the arguments.
+     * @param v the other vector, to calculate the distance to.
+     * @return the square distance, in pixels, between this vector and v.
+     */
+    public double sqDist(Vector2i v) {
+        return sqr(x - v.x) + sqr(y - v.y);
+    }
 //
 //    /**
 //     * Gets the magnitude of the vector.

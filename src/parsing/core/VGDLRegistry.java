@@ -28,7 +28,7 @@ public class VGDLRegistry {
 	public void registerSprite(SpriteDefinition sd){
 		spriteNameToDefinition.put(sd.spriteName, sd);
 		spriteNameToId.put(sd.spriteName, sd.id);
-		System.out.println(sd);
+		System.out.println("Registering.. " + sd);
 	}
 	
 

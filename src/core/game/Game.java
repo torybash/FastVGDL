@@ -18,7 +18,7 @@ import core.player.AbstractPlayer;
 
 public class Game {
 
-	String gameTitle = "";
+	public String gamePath = "";
 	
 	ArrayList<SpriteDefinition> spritesDefinitions = new ArrayList<SpriteDefinition>();
 	ArrayList<Termination> terms = new ArrayList<Termination>();
