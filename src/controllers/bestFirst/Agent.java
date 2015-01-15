@@ -16,6 +16,12 @@ import tools.Vector2i;
 import core.game.ForwardModel;
 import core.game.Game;
 import core.player.AbstractPlayer;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.Arrays;
+import java.util.Collections; 
+import parsing.core.VGDLParser;
+import tools.IO;
 
 public class Agent extends AbstractPlayer{
 
@@ -31,7 +37,7 @@ public class Agent extends AbstractPlayer{
 //    int[] solution;
     int solutionIndex = 0;
     
-    ArrayDeque<Node> q = new ArrayDeque<Node>();
+    ArrayList<Node> q = new ArrayList<Node>();
     HashSet<Node> visitedNodes = new HashSet<Node>();
     
     
@@ -50,6 +56,12 @@ public class Agent extends AbstractPlayer{
     boolean initialized = false;
     ForwardModel fm = null;
     
+    
+    //Goal interaction
+    int[] goalInterSprites;
+//    int goalInterSprite1 = -1;
+//    int goalInterSprite2 = -1;
+    
     private void initialize(Game game){
     	ArrayList<ACTIONS> act = game.getAvailableActions();
     	actions = new ACTIONS[act.size()];
@@ -65,298 +77,108 @@ public class Agent extends AbstractPlayer{
     	widthOfLevel = game.levelSize.x;
     	heightOfLevel = game.levelSize.y;
     	wallPositions = new boolean[widthOfLevel * heightOfLevel + 1];
-		for (int i = 0; i < fm.spriteGroups.length; i++) {
-			SpriteGroup sg = fm.spriteGroups[i];
-			
-			for (Integer groupId : sg.sprites.keySet()) {
-				Sprite sp = sg.sprites.get(groupId);
-				
-				if (sp.name.equals("wall")){
-					wallPositions[getPositionKey(sp.position)] = true;
-				}
-			}
-		}
-		
+        for (int i = 0; i < fm.spriteGroups.length; i++) {
+            SpriteGroup sg = fm.spriteGroups[i];
+
+            for (Integer groupId : sg.sprites.keySet()) {
+                Sprite sp = sg.sprites.get(groupId);
+
+                if (sp.name.equals("wall")){
+                    wallPositions[getPositionKey(sp.position)] = true;
+                }
+            }
+        }
+        
+        goalInterSprites = VGDLParser.GetInstance().getGoalInteraction(game.gamePath);
+
         initialized = true;
     }
         
-	public ACTIONS act(Game game, ElapsedCpuTimer ect) {
+    public ACTIONS act(Game game, ElapsedCpuTimer ect) {
 
-            if (!initialized)initialize(game);
+        if (!initialized)initialize(game);
 
-            if (foundSolution){
-                solutionIndex++;
-                return actions[solution.get(solutionIndex)];			
+        if (foundSolution){
+            solutionIndex++;
+            return actions[solution.get(solutionIndex)];			
+        }
+
+        if (q.isEmpty()){
+            HashSet<Moveable> moveables = getMoveables(fm);
+            Node currentNode = new Node(fm, heuristic(moveables), new ArrayList<Integer>(), moveables);
+            q.add(currentNode);
+        }
+
+        int numIters = 0;
+        while(!q.isEmpty()){
+            Node n = q.remove(q.size()-1);
+
+            if (LOOP_VERBOSE){
+                System.out.println("*********ITERATION " + numIters + " ********");
+                if (n.list.size() > 0) System.out.println("best current node: " + n);
             }
+           
 
-            if (q.isEmpty()){
-                Node currentNode = new Node(fm, heuristic(fm), new ArrayList<Integer>());
-                q.add(currentNode);
-            }
-
-            while(!q.isEmpty()){
-                Node n = q.poll();
-                
-                
-                if (n.fwdModel.won){
-                    solution = n.list;
-                    foundSolution = true;
-                    if (VERBOSE){ 
-                            System.out.println("FOUND SOLUTION!");
-                    }
-                    return actions[solution.get(solutionIndex)];
+            if (n.fwdModel.won){
+                solution = n.list;
+                foundSolution = true;
+                if (VERBOSE){ 
+                    System.out.println("FOUND SOLUTION!");
                 }
-                
-                for (int i = 0; i < actions.length; i++) {
-                    
-                  
-                    
-                    n.fwdModel.copy().advance(actions[i]);
-                    
-                    ForwardModel nextState = n.fwdModel.copy();
-                    nextState.advance(actions[i]);
-                    
-                    float nextScore = heuristic(nextState);
-                    
-                    Node new_n = new Node(nextState, nextScore, ((ArrayList)n.list.clone()));
-                    new_n.addAction(i);
-                    
-                }
-                
+                return actions[solution.get(solutionIndex)];
             }
-        
-//        double avgTimeTaken = 0, acumTimeTaken = 0;
-//        long remaining = ect.remainingTimeMillis();
-//        int numIters = 0, remainingLimit = 5, lastDepth = -1;
-//        ElapsedCpuTimer elapsedTimerIteration = new ElapsedCpuTimer(TimerType.CPU_TIME);
-//        boolean queueEmpty = false;
-//        ForwardModel currentState = null;
-//        
-//        while(remaining > 2*avgTimeTaken && remaining > remainingLimit)
-//        {
-//            if (LOOP_VERBOSE) System.out.println("START LOOP--" + elapsedTimerIteration.elapsedMillis() + " --> " + acumTimeTaken + " (" + remaining + "),  avgTimeTaken: " + avgTimeTaken + " - iters: " +numIters);
-//            if (LOOP_VERBOSE) System.out.println("visited node size: " + visitedNodes.size());
-//            
-//            boolean nodeAlreadyExists = false;
-//            boolean moveablesHaveChanged = false;
-//        	
-//            if (q.isEmpty()){
-//                    if (VERBOSE) System.out.println("QUEUE EMPTY!!!");
-//                    return ACTIONS.ACTION_NIL; 
-//            }
-//
-//            Node n = null;
-//            n = q.pollFirst();
-//
-//
-//            if (n.lastAction >= 0){
-//                    n.list = (ArrayList<Integer>) n.list.clone();
-////        		n.list = (LinkedList<Integer>) n.list.clone();
-////        		n.list = n.list.clone();
-//                    n.addAction(n.lastAction);
-////                    n.fwdModel = n.fwdModel.copy();
-//            }
-//
-//            int d = n.list.size();
-//
-//            HashSet<Moveable> lastMoveables = (HashSet<Moveable>) n.moveables.clone();
-//
-////            if (d > 0){
-////            	n.fwdModel.advance(actions[n.lastAction]);
-////            }
-//            
-//            if (d > 0){            	
-//            	currentState = n.getFwdModel();
-//                if (currentState == null) currentState = playbackActions(fm, n.list);
-//                       
-//            }else{
-//            	currentState = fm;
-//            }
-//
-//            n.moveables = getMoveables(currentState);
-//            n.avatarPos = currentState.avatarSprite.position.copy();            
-////            n.moveables = getMoveables(n.fwdModel);
-////            n.avatarPos = n.fwdModel.avatarSprite.position.copy();
-//        	//Node has now finished initializing
-//        	
-//        	
-//        	if (!lastMoveables.equals(n.moveables)){
-//        		moveablesHaveChanged = true;
-//        	}
-//
-////        	System.out.println("5 moveable");
-//        	for (Moveable moveable : n.moveables) {
-////                    if (moveable.type == 5){
-////                        System.out.println(moveable);
-////                    }
-//                }
-//            
-//        	
-//        	if (LOOP_VERBOSE){
-//        		System.out.println("---New node initialized!--- (iteration: " + numIters + " - q length: + " + q.size() +")");
-//        		System.out.println("Node action list: " + getActionList(n.list));
-//	            System.out.println("Avatar pos: " + n.avatarPos);
-//	            System.out.println("Moveables: " + n.moveables);
-//	            System.out.println((moveablesHaveChanged ? "Moveable HAVE CHANGED" : "Moveables did not change"));
-//        	}
-//        	
-//        	if (visitedNodes.contains(n)){
-//        		if (LOOP_VERBOSE){
-//	        		Node existingNode = null;
-//	        		for (Node node : visitedNodes) if (node.equals(n)) existingNode = node;
-//	        		System.out.println("VISITED ALREADY NODES CONTAIN NODE!! (visited node size: " + visitedNodes.size() + ")");
-//	        		System.out.println("orig actions: "+getActionList(existingNode.list));
-//	        		System.out.println("new actions: "+getActionList(n.list));
-//        		}
-//        		nodeAlreadyExists = true;
-//        	}
-//
-//
-//        	if (!nodeAlreadyExists){
-//	        	boolean gameLost = false;
-//	        	if (currentState.isEnded){
-//	        		if (currentState.won){
-//		        		solution = n.list;
-//		        		foundSolution = true;
-//		        		if (VERBOSE){ 
-//		        			System.out.println("FOUND SOLUTION!");
-//		        			System.out.println("Avatar pos: " + currentState.avatarSprite.position);
-//			        		System.out.println("Solution: " + getActionList(solution));
-//			        		System.out.println("Solution length: " + n.list.size());
-////			        		System.out.println("Solution length: " + n.currIdx);
-//			        		System.out.println("Visited nodes: " + visitedNodes.size());
-//			        		System.out.println("Queue size: " + q.size());
-//			        		System.out.println("Moveables: " + n.moveables);
-////			        		System.out.println(currentState.spriteGroups[5].sprites);
-//		        		}
-//		        		return actions[solution.get(solutionIndex)];
-//	        		}else{
-//	        			gameLost = true;
-//	        		}
-//	        	}
-//	
-//	        	//Expansion
-//	        	if (!gameLost){
-//	        		
-//	    			if (solutionTest != null){
-//	    				Node n_new = new Node(n.list, n.moveables, solutionTest[solutionIndex]);
-//	    				q.add(n_new);
-//	    				solutionIndex++;
-//	    			}else{
-//	    			
-//		    		for (int i = 0; i < actions.length; i++) {
-//		    			//Dont expand into walls
-//		    			Vector2i expectedNewPos = changePosByAction(n.avatarPos, i);
-//		    			if (wallPositions[getPositionKey(expectedNewPos)]){
-////		    				System.out.println();
-//		    				continue;
-//		    			}
-//		    			
-//		    			//Dont expand in opposite direction, if moveables haven't changed
-//		    			if (!moveablesHaveChanged){
-//		    				if (n.lastAction >= 0 && actions[i] == oppositeDirectionAction(n.lastAction)){
-////		    					System.out.println("Skipping expansion in opposite direction");
-//		    					continue;
-//		    				}
-//		    			}
-//
-//		    			
-//		    			Node n_new = new Node(n.list, n.moveables, i);
-////			    			n_new.currIdx = n.currIdx;
-////			        		if (nodeInteresting){
-////			        			q.addFirst(n_new);
-////			        		}else{
-////			        			q.add(n_new);
-////			        		}
-//		    			if (depthFirst){
-////		    			if (depthFirst || q.size() > MAX_QUEUE_SIZE){
-////                                        if (depthFirst || moveablesHaveChanged){
-//		    				q.addFirst(n_new);
-//		    			}else{
-//		    				q.add(n_new);
-//		    			}
-//		    		}
-//		    		
-//	    			}
-//	        	}
-//	    		
-//	    		visitedNodes.add(n);
-//        	}
-//        	
-////        	n.fwdModel = null;
-//        	
-//            if (!nodeAlreadyExists) numIters++;
-//            acumTimeTaken = (elapsedTimerIteration.elapsedMillis());
-//            avgTimeTaken = numIters == 0 ? 0 : acumTimeTaken/numIters;
-//            remaining = ect.remainingTimeMillis();
-//            lastDepth = d;
-//            if (LOOP_VERBOSE) System.out.println("END LOOP--" + elapsedTimerIteration.elapsedMillis() + " --> " + acumTimeTaken + " (" + remaining + "),  avgTimeTaken: " + avgTimeTaken + " - iters: " +numIters);
-//        }
-        
-//        if (VERBOSE) printVisitedNodes();
+
+            for (int i = 0; i < actions.length; i++) {
+                ForwardModel nextState = n.fwdModel.copy();
+                nextState.advance(actions[i]);
+
+                HashSet<Moveable> nextMoveables = getMoveables(nextState);
+                
+                Node new_n = new Node(nextState, heuristic(nextMoveables), ((ArrayList)n.list.clone()), nextMoveables);
+                new_n.addAction(i);
+             
+
+
+                if (LOOP_VERBOSE){
+                    System.out.println("Checking new_n: " + new_n);
+                    System.out.println("visitedNodes.contains(new_n): " + visitedNodes.contains(new_n));
+                    System.out.println("q.contains(new_n): " + q.contains(new_n));
+                }
+                if (!visitedNodes.contains(new_n) && !q.contains(new_n)){
+                    visitedNodes.add(new_n);
+
+                    q.add(new_n);
+                    Collections.sort(q);
+
+
+                    if (LOOP_VERBOSE) System.out.println("new_n action list: " + new_n.list);
+                }
+                if (LOOP_VERBOSE) System.out.println("------Q: " +q);
+            }
+            
+            numIters++;
+            
+            if (VERBOSE && numIters%100 == 0){
+                System.out.println("Visited nodes: " + visitedNodes.size() + ", Queue size: " + q.size());
+            }
+        }
         
         if (VERBOSE) System.out.println("Haven't found solution yet - returning ACTION_NIL, gametick: "  +game.gametick);
         if (VERBOSE) System.out.println("Visited nodes: " + visitedNodes.size() + ", Queue size: " + q.size());
         return ACTIONS.ACTION_NIL;	//haven't found solution yet - return nil
-  	}
+    }
 
 
 
-	private void wasteTime(float factor) {
-		System.out.println("COULDN'T FIND SOLUTION FOR GAME - WASTING TIME");
-		int c = 0;
-		for (int i = 0; i < 10000000 * factor; i++) {
-			c = (int) Math.pow(i, 2);
-		}
-		
-	}
+    private void wasteTime(float factor) {
+        System.out.println("COULDN'T FIND SOLUTION FOR GAME - WASTING TIME");
+        int c = 0;
+        for (int i = 0; i < 10000000 * factor; i++) {
+                c = (int) Math.pow(i, 2);
+        }
+    }
 
-	HashSet<Moveable> getMoveables(ForwardModel fwdModel){
-		
-		HashSet<Moveable> result = new HashSet<Moveable>();
-		
-		for (int i = 0; i < fwdModel.spriteGroups.length; i++) {
-			SpriteGroup sg = fwdModel.spriteGroups[i];
-			
-			for (Integer groupId : sg.sprites.keySet()) {
-				Sprite sp = sg.sprites.get(groupId);
-								
-				if (!sp.isAvatar && !sp.name.equals("wall") && !sp.name.equals("ground")){
-					result.add(new Moveable(sp.position, sp.id));
-				}
-			}
-		}
-		
-//		
-//		if (so.getMovablePositions() != null){
-//			for (ArrayList<Observation> arrayList : so.getMovablePositions()) {
-//				for (Observation observation : arrayList) {
-//					result.add(new Moveable(observation.position, observation.itype));
-//				}
-//			}
-//		}
-//			
-//				
-//		if (so.getImmovablePositions() != null){
-//			for (ArrayList<Observation> arrayList : so.getImmovablePositions()) {
-//				for (Observation observation : arrayList) {
-//					if (observation.itype == 0) continue; //<- wall
-//					result.add(new Moveable(observation.position, observation.itype));
-//				}
-//			}
-//		}
-//		
-//		if (so.getResourcesPositions() != null){
-//			for (ArrayList<Observation> arrayList : so.getResourcesPositions()) {
-//				for (Observation observation : arrayList) {
-//					result.add(new Moveable(observation.position, observation.itype));
-//				}
-//			}
-//		}
 
-		return result;
-	}
-	
 	
     ArrayList<ACTIONS> getActionList(ArrayList<Integer> list){
     	ArrayList<ACTIONS> result = new ArrayList<ACTIONS>();
@@ -366,82 +188,9 @@ public class Agent extends AbstractPlayer{
 		}
     	return result;
     }
-//    
-//    ArrayList<ACTIONS> getActionList(int[] list){
-//    	ArrayList<ACTIONS> result = new ArrayList<ACTIONS>();
-//    	
-//		for (int i = 0; i < list.length; i++) {
-//			ACTIONS act = actions[list[i]];
-//			result.add(act);
-//		}
-//    	return result;
-//    }
-//    
-//    private double value(StateObservation a_gameState) {
-//
-//        boolean gameOver = a_gameState.isGameOver();
-//        Types.WINNER win = a_gameState.getGameWinner();
-//        double rawScore = a_gameState.getGameScore();
-//
-//        if(gameOver && win == Types.WINNER.PLAYER_LOSES)
-//            return -100000;
-//
-//        if(gameOver && win == Types.WINNER.PLAYER_WINS){
-//            return 1000 + rawScore; //rawScore + a_gameState.getGameTick() > 1000 ? 100000 : 0;  //WINNING IS ONLY GOOD LATE IN GAME
-//        }
-//            
-//        return rawScore;
-//    }
-//    
-//    private void printVisitedNodes(){
-//
-//    	System.out.println("------------------------");
-//    	System.out.println("--PRINTING VISITED NODES");
-//    	System.out.println("------------------------");
-//    	for (Node n : visitedNodes) {
-//    		printNode(n);
-//		}
-//    }
-//    
-//    private void printNode(Node n){
-//    	int[][] map = new int[widthOfLevel][];
-//    	for (int i = 0; i < widthOfLevel; i++) {
-//    		map[i] = new int[heightOfLevel];
-//		}
-//    	
-//       	int avatar_x = (int) (n.avatarPos.x / blockSize);
-//    	int avatar_y = (int) (n.avatarPos.y / blockSize);
-//    	
-//    	map[avatar_x][avatar_y] = "A".charAt(0) - 36;
-//    	
-//    	System.out.println("Avatar pos: " + n.avatarPos + " -> int pos: " + avatar_x + ", " + avatar_y);
-////    	for (Moveable m : n.moveables) {
-////    		
-////    		int x = (int) (m.pos.x / blockSize);
-////    		int y = (int) (m.pos.y / blockSize);
-////    		System.out.println(m + " -> int pos: " + x + ", " + y);
-////    		map[x][y] = (char)m.type;
-////		}
-//    	
-//    	String mapString = "";
-//    	for (int j = 0; j < heightOfLevel; j++) {
-//    		for (int i = 0; i < widthOfLevel; i++) {
-//				if (map[i][j] > 0){
-//					mapString += (char)(map[i][j] + 36);
-//				}else{
-//					mapString += ".".charAt(0);
-//				}
-//			}
-//			mapString += "\n";
-//		}
-//    	
-//    	
-////    	System.out.println(getActionList(n.list));
-//    	System.out.println(mapString);
-//    	System.out.println();
-//    }
-//    
-//    
+    
+
+      
     private int getPositionKey(Vector2i vec){
     	if (vec == null) return 0;
     	if (vec.x < 0 || vec.y < 0 || vec.x >= widthOfLevel || vec.y >= heightOfLevel) return widthOfLevel * heightOfLevel;
@@ -498,18 +247,57 @@ public class Agent extends AbstractPlayer{
     }
     
     
-    	private ForwardModel playbackActions(ForwardModel currentState,	ArrayList<Integer> list) {
-		ForwardModel result = currentState.copy();
-		
-		for (Integer act : list) {
-                    result.advance(actions[act]);
-		}
-		return result;
-	}
+    private ForwardModel playbackActions(ForwardModel currentState,	ArrayList<Integer> list) {
+            ForwardModel result = currentState.copy();
+
+            for (Integer act : list) {
+                result.advance(actions[act]);
+            }
+            return result;
+    }
+
         
-        
-        private float heuristic(ForwardModel state){
-            
-            return 0;
+    private float heuristic(HashSet<Moveable> moveables){
+
+        float result = 0;
+                
+        ArrayList<Moveable> sprite1s = new ArrayList<Moveable>();
+        ArrayList<Moveable> sprite2s = new ArrayList<Moveable>();
+        for (Moveable moveable : moveables) {
+            if (moveable.type == goalInterSprites[0]) sprite1s.add(moveable);
+            if (moveable.type == goalInterSprites[1]) sprite2s.add(moveable);
         }
+        
+        for (Moveable sprite1 : sprite1s) {
+            double shortestDist = Double.POSITIVE_INFINITY;
+//            Moveable closestSprite = null;
+            for (Moveable sprite2 : sprite2s) {
+                double dist = sprite1.pos.sqDist(sprite2.pos);
+                if (dist < shortestDist){
+                    shortestDist = dist;
+//                    closestSprite = sprite2;
+                }
+            }
+            
+            result += shortestDist;
+        }
+        
+        return result;
+    }
+        
+            
+    HashSet<Moveable> getMoveables(ForwardModel fwdModel){
+        HashSet<Moveable> result = new HashSet<Moveable>();
+        for (int i = 0; i < fwdModel.spriteGroups.length; i++) {
+            SpriteGroup sg = fwdModel.spriteGroups[i];
+            for (Integer groupId : sg.sprites.keySet()) {
+                Sprite sp = sg.sprites.get(groupId);
+                if (!sp.name.equals("wall") && !sp.name.equals("ground")){
+                    result.add(new Moveable(sp.position, sp.id));
+                }   
+            }
+        }
+        return result;
+    }
+    
 }
