@@ -1,29 +1,39 @@
 package controllers.puzzleSolverPlus;
 
 import java.util.HashSet;
-import java.util.LinkedList;
 
 import tools.Vector2i;
 import core.game.ForwardModel;
+import java.util.ArrayList;
 
 public class Node {
-	public ForwardModel fwdModel;
+	ForwardModel fwdModel = null;
 	public Vector2i avatarPos;
-	public LinkedList<Integer> list = new LinkedList<Integer>();
+	public ArrayList<Integer> list = new ArrayList<Integer>();
+//	public LinkedList<Integer> list = new LinkedList<Integer>();
 	public HashSet<Moveable> moveables = new HashSet<Moveable>();
-	int moveablesHashcode = 0;
 	
 	public int lastAction = -1;
 	
-	public Node(ForwardModel fwdModel, LinkedList<Integer> list, HashSet<Moveable> moveables, int lastAction){
+	public Node(ArrayList<Integer> list, HashSet<Moveable> moveables, int lastAction){
+//	public Node(ForwardModel fwdModel, ArrayList<Integer> list, HashSet<Moveable> moveables, int lastAction){
+//	public Node(ForwardModel fwdModel, LinkedList<Integer> list, HashSet<Moveable> moveables, int lastAction){
 //	public Node(StateObservation state, LinkedList<Integer> list, int moveablesHashcode, int lastAction){
-		this.fwdModel = fwdModel;
+//		this.fwdModel = fwdModel;
 		this.list = list;
 		this.moveables = moveables;
 //		this.moveablesHashcode = moveablesHashcode;
 		this.lastAction = lastAction;
 	}
 	
+        
+        public Node(ForwardModel fwdModel, ArrayList<Integer> list, HashSet<Moveable> moveables, int lastAction){
+		this.fwdModel = fwdModel;
+		this.list = list;
+		this.moveables = moveables;
+//		this.moveablesHashcode = moveablesHashcode;
+		this.lastAction = lastAction;
+	}
 	
 	public void addAction(int act){
 		list.add(act);
@@ -82,6 +92,11 @@ public class Node {
 		return result;
 	}
 
-	
+        
+        public ForwardModel getFwdModel(){
+            
+            
+            return fwdModel;
+        }
 	
 }
