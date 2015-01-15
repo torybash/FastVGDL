@@ -46,12 +46,12 @@ public class Game {
 	
 	int numSprites = 0;
 		
-	final int STANDARD_DELAY = 40;
-	final int MAX_GAME_TICKS = 20000;
+	final int STANDARD_DELAY = 50;
+	final int MAX_GAME_TICKS = 2000000;
 	
 	public boolean won = false;
 	
-	boolean visuals = false;
+	public boolean visuals = false;
 	
 	ArrayList<ACTIONS> availableActions = null;
 	
@@ -145,6 +145,8 @@ public class Game {
 	    this.clearAll();                //clear all additional data, including dead sprites.
 	    this.terminationHandling();     //check for game termination.
 	    this.checkTimeout();            //Check for end of game by time steps.
+            
+            
 	}
 
 
@@ -342,13 +344,15 @@ public class Game {
 		
 //		System.out.println("ADDING SPRITE: " + sd.spriteName + " AT " + x + ", " + y + " --- image: " + sd.parameters.get("img") + " id: " + sd.id);
 
-		Sprite sp = null;
-		try {
-			Constructor spriteConstructor = sd.spriteClass.getConstructor();
-			sp = (Sprite) spriteConstructor.newInstance();
-		} catch (Exception e) {
-			e.printStackTrace();
-		} 
+//                System.out.println("adding sprite -- sd.defaultSprite " + sd.defaultSprite);
+            
+		Sprite sp = sd.defaultSprite.copy();
+//		try {
+//			Constructor spriteConstructor = sd.spriteClass.getConstructor();
+//			sp = (Sprite) spriteConstructor.newInstance();
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		} 
 		sp.id = sd.id;
 		sp.name = sd.spriteName;
 		sp.position = new Vector2i(x, y);
@@ -363,7 +367,9 @@ public class Game {
 			if (sp.img == null) sp.img = "avatar";
 		}
 		
-		sp.parseParameters(sd.parameters);
+//                System.out.println("sp " + sp + ", visuals: " + visuals + ", sd.parameters.get(\"img\"): " + sd.parameters.get("img"));
+                
+//		sp.parseParameters(sd.parameters);
 		
 		if (visuals) sp.loadImage(sd.parameters.get("img"));
 		

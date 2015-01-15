@@ -25,22 +25,18 @@ public abstract class Sprite {
 	
 	public int groupId;
 	
-	public Color color;
+//	public Color color;
 	public String img;
 	public int orientation = -1;
-	public double speed;
-	public double shrinkfactor;
+//	public double speed;
+//	public double shrinkfactor;
 	
     /**
      * Rectangle that this sprite occupies on the screen.
      */
     public Rectangle rect;
 
-    /**
-     * Rectangle occupied for this sprite in the previous game step.
-     */
-    public Rectangle lastrect;
-    
+
     
     
     public Vector2i position;

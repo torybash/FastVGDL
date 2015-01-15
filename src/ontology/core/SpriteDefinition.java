@@ -1,5 +1,6 @@
 package ontology.core;
 
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -7,6 +8,7 @@ import java.util.HashMap;
 import ontology.Types;
 import parsing.core.Node;
 import parsing.core.VGDLParser;
+import tools.Vector2i;
 
 public class SpriteDefinition {
 	
@@ -19,6 +21,10 @@ public class SpriteDefinition {
 	public boolean leafNode = false;
 	public SpriteDefinition parentDef = null;
 	public boolean isAvatar = false;
+        
+        public Sprite defaultSprite = null;
+        
+        
 	
 	public SpriteDefinition(Node n, boolean leafNode, SpriteDefinition parentDef){
 		
@@ -48,10 +54,18 @@ public class SpriteDefinition {
 		addParameters(n);
 		
 		if (spriteClass != null && spriteClass.getSimpleName().contains("vatar")) isAvatar = true;
+                
+                
+                
+                makeDefaultSprite();
+                
+
 	}
 	
 	
 	
+   
+        
 	public SpriteDefinition(String name) {
 		spriteName = name;
 		if (name == "avatar"){
@@ -63,9 +77,30 @@ public class SpriteDefinition {
 			parameters.put("img", "wall");
 		}
 		leafNode = true;
+                makeDefaultSprite();
 	}
 
 
+        
+        private void makeDefaultSprite(){
+            		try {
+			Constructor spriteConstructor = spriteClass.getConstructor();
+			defaultSprite = (Sprite) spriteConstructor.newInstance();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} 
+		defaultSprite.id = id;
+		defaultSprite.name = spriteName;
+		defaultSprite.position = new Vector2i();
+                defaultSprite.lastPosition = new Vector2i();
+                        
+		if (isAvatar){
+			defaultSprite.isAvatar = true;
+			if (defaultSprite.img == null) defaultSprite.img = "avatar";
+		}
+		
+		defaultSprite.parseParameters(parameters);
+        }
 
 	private void addParameters(Node n) {
 		String pieces[] = n.contentLine.split(" ");
