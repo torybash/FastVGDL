@@ -1,28 +1,41 @@
-import parsing.core.VGDLFactory;
-import parsing.core.VGDLParser;
-import core.game.Game;
-import core.player.AbstractPlayer;
+import fastVGDL.parsing.core.VGDLFactory;
+import fastVGDL.parsing.core.VGDLParser;
+import fastVGDL.core.game.Game;
+import fastVGDL.core.game.GamePlayer;
+import fastVGDL.core.game.results.GameResults;
+import fastVGDL.core.player.AbstractPlayer;
 
 
 
 public class Test {
     public static void main(String[] args) {
 
-        String game_title = "realsokoban";
+        String game_title = "bait";
         int level = 1;
 
         String game_desc = "../gvgai/examples/gridphysics/"+game_title+".txt";
         String level_desc = "../gvgai/examples/gridphysics/"+game_title+"_lvl"+level+".txt";
-
-        Game game = VGDLParser.GetInstance().parseGame(game_desc);
-
-        game.visuals = true;
-        VGDLParser.GetInstance().parseLevel(game, level_desc);
-
-        AbstractPlayer humanPlayer = VGDLFactory.GetInstance().createController("controllers.human.Agent");
-        AbstractPlayer puzzlePlayer = VGDLFactory.GetInstance().createController("controllers.puzzleSolverPlus.Agent");
-
-        game.playGameWithGraphics(puzzlePlayer);
+        
+        String puzzleController = "fastVGDL.controllers.puzzleSolverPlus.Agent";
+        String humanController = "fastVGDL.controllers.human.Agent";
+        
+        GameResults results = GamePlayer.playGame(game_desc, level_desc, puzzleController, true);
+        
+        System.out.println(results);
+//        String game_desc = "../gvgai/examples/gridphysics/"+game_title+".txt";
+//        String level_desc = "../gvgai/examples/gridphysics/"+game_title+"_lvl"+level+".txt";
+//
+//        Game game = VGDLParser.GetInstance().parseGame(game_desc);
+//
+//        game.visuals = true;
+//        VGDLParser.GetInstance().parseLevel(game, level_desc);
+//
+//        AbstractPlayer humanPlayer = VGDLFactory.GetInstance().createController("controllers.human.Agent");
+//        AbstractPlayer puzzlePlayer = VGDLFactory.GetInstance().createController("controllers.puzzleSolverPlus.Agent");
+//        AbstractPlayer bestFirstPlayer = VGDLFactory.GetInstance().createController("controllers.bestFirst.Agent");
+//
+//        game.playGameWithGraphics(puzzlePlayer);
+//                game.playGameWithGraphics(bestFirstPlayer);
 //		game.playGameWithGraphics(humanPlayer);
 //		game.playGame(puzzlePlayer);
 
