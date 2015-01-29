@@ -210,8 +210,10 @@ public class VGDLParser {
     	for (SpriteDefinition sd : spriteDefinitions) {
     		if (!sd.leafNode) continue;
     		if (sd.spriteClass.getSimpleName().contains("vatar")){
-    			hasAvatar = true;
-    			avatarDefinition = sd;
+    			if (sd.leafNode){
+	    			hasAvatar = true;
+	    			avatarDefinition = sd;
+    			}
     			break;
     		}
     	}

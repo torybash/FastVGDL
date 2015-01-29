@@ -34,7 +34,7 @@ public class Agent extends AbstractPlayer{
     final int MAX_VISITED_NODES = 5000000;
     final int MAX_QUEUE_SIZE = 2000000;
 	
-    final boolean VERBOSE = false;
+    final boolean VERBOSE = true;
     final boolean LOOP_VERBOSE = false;
     
     final boolean depthFirst = false;
@@ -91,8 +91,8 @@ public class Agent extends AbstractPlayer{
         ElapsedCpuTimer elapsedTimerIteration = new ElapsedCpuTimer(TimerType.CPU_TIME);
         ForwardModel currentState = null;
         
-//        while(remaining > 2*avgTimeTaken && remaining > remainingLimit)
-        while(true)
+        while(remaining > 2*avgTimeTaken && remaining > remainingLimit)
+//        while(true)
         {
             if (LOOP_VERBOSE) System.out.println("START LOOP--" + elapsedTimerIteration.elapsedMillis() + " --> " + acumTimeTaken + " (" + remaining + "),  avgTimeTaken: " + avgTimeTaken + " - iters: " +numIters);
             if (LOOP_VERBOSE) System.out.println("visited node size: " + visitedNodes.size());
@@ -244,9 +244,9 @@ public class Agent extends AbstractPlayer{
         
 //        if (VERBOSE) printVisitedNodes();
         
-//        if (VERBOSE) System.out.println("Haven't found solution yet - returning ACTION_NIL, gametick: "  +game.gametick);
-//        if (VERBOSE) System.out.println("Visited nodes: " + visitedNodes.size() + ", Queue size: " + q.size() + ", lastDepth: " + lastDepth);
-//        return ACTIONS.ACTION_NIL;	//haven't found solution yet - return nil
+        if (VERBOSE) System.out.println("Haven't found solution yet - returning ACTION_NIL, gametick: "  +game.gametick);
+        if (VERBOSE) System.out.println("Visited nodes: " + visitedNodes.size() + ", Queue size: " + q.size() + ", lastDepth: " + lastDepth);
+        return ACTIONS.ACTION_NIL;	//haven't found solution yet - return nil
     }
 
 

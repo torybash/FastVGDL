@@ -43,7 +43,7 @@ public class Game {
 	ArrayList<Sprite> killList = new ArrayList<Sprite>();
 	
 	
-	int numSprites = 0;
+
 		
 	final int STANDARD_DELAY = 50;
 	final int MAX_GAME_TICKS = 2000000;
@@ -54,7 +54,7 @@ public class Game {
 	
 	ArrayList<ACTIONS> availableActions = null;
 	
-	
+	public int numSprites = 0;
 	public int numActions = 0;
 	public int numInteractions = 0;
 	
@@ -128,7 +128,16 @@ public class Game {
 			
 			for (Integer key : sg.sprites.keySet()) {
 				Sprite sp = sg.sprites.get(key);
-				sp.loadImage(sp.img);
+//				System.out.println(sp.img);
+				
+				if (sp.img != null){
+					sp.loadImage();
+				}
+//				else if (sp.color != null){
+//					sp.loadColor();
+//				}
+//				
+				
 			}
 		}
 		
@@ -285,16 +294,13 @@ public class Game {
 			//Sprite 2:
 			if (inter.id2 == -1){
 				//EOS effect
-//				for (SpriteGroup sg1 : sg1s) {
-//					for (Integer sp1key : sg1.sprites.keySet()) {
-//						Sprite sp1 = sg1.sprites.get(sp1key);
-//						if (sp1.position.x < 0 || sp1.position.x >= levelSize.x || sp1.position.y < 0 || sp1.position.y >= levelSize.y){
+				for (Sprite sp1 : s1s) {
+					if (sp1.position.x < 0 || sp1.position.x >= levelSize.x || sp1.position.y < 0 || sp1.position.y >= levelSize.y){
 //							System.out.println("Interaction execute!: " + inter.getClass().getSimpleName() + ", " + inter.id1 + " - " + inter.id2);
 //							System.out.println(sp1.name + "("+sp1.id+")" + " colliding with EOS");
-//							inter.execute(sp1, null, this);
-//						}
-//					}
-//				}
+						inter.execute(sp1, null, this);
+					}
+				}
 			}else if (spriteGroups[inter.id2].leafNode){
 				for (Sprite sprite : spriteGroups[inter.id2].sprites.values()) {
 					s2s.add(sprite);
@@ -362,6 +368,7 @@ public class Game {
 		
 //		System.out.println("ADDING SPRITE: " + sd.spriteName + " AT " + x + ", " + y + " --- image: " + sd.parameters.get("img") + " id: " + sd.id);
 
+//		System.out.println("Num sprites: " + numSprites);
 //                System.out.println("adding sprite -- sd.defaultSprite " + sd.defaultSprite);
             
 		Sprite sp = sd.defaultSprite.copy();
@@ -389,7 +396,11 @@ public class Game {
                 
 //		sp.parseParameters(sd.parameters);
 		
-		if (visuals) sp.loadImage(sd.parameters.get("img"));
+		if (visuals){
+			sp.loadImage(sd.parameters.get("img"));
+		}
+		
+		numSprites++;
 		
 		return sp;
 	}

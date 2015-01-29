@@ -9,6 +9,7 @@ public class GameResults {
 	public int actions;
 	
 	public int interactions;
+	public int numberSprites;
 	
 	public int visitedNodes;
 	public int possibleSolutions;
@@ -19,7 +20,7 @@ public class GameResults {
 		ticks = game.gametick;
 		actions = game.numActions;
 		interactions = game.numInteractions;
-		
+		numberSprites = game.numSprites;
 	}
 	
 	

@@ -45,6 +45,7 @@ public abstract class Sprite {
     
     Vector2i direction = new Vector2i();
     Image image;
+    public Color color;
     
     public void update(Game game){
     	lastPosition.x = position.x;
@@ -71,7 +72,6 @@ public abstract class Sprite {
     	rect.x = position.x * game.getBlockSize();
     	rect.y = position.y * game.getBlockSize();
 
-    	
     	
 //        if(!invisible)
         {
@@ -123,7 +123,7 @@ public abstract class Sprite {
 //            r.y += (rect.height-r.height)/2;
 //        }
 
-        gphx.setColor(new Color(255, 0, 0));
+        gphx.setColor(color);
 
 //        if(is_avatar)
 //        {
@@ -209,12 +209,19 @@ public abstract class Sprite {
 	
     public void loadImage(String str)
     {
-        if(image == null && str != null)
+    	img = str;
+    	loadImage();
+    }
+    
+    public void loadImage()
+    {
+//    	System.out.println(img);
+        if(image == null && img != null)
         {
             //load image.
             try {
-                if (!(str.contains(".png"))) str = str + ".png";
-                String image_file = path +  str;
+                if (!(img.contains(".png"))) img = img + ".png";
+                String image_file = path +  img;
                 if((new File(image_file).exists())) {
                     image = ImageIO.read(new File(image_file));
                 }
@@ -224,7 +231,7 @@ public abstract class Sprite {
                 }
 
             } catch (IOException e) {
-                System.out.println("Image " + str + " could not be found.");
+                System.out.println("Image " + img + " could not be found.");
                 e.printStackTrace();
             }
         }
@@ -259,6 +266,7 @@ public abstract class Sprite {
 		targetSprite.groupId = groupId;
 		targetSprite.isAvatar = isAvatar;
 		targetSprite.orientation = orientation;
+		targetSprite.color = color;
 	}
 
 
@@ -307,7 +315,6 @@ public abstract class Sprite {
                     }
                 }
                 try {
-//                	System.out.println("parameter:." + parameter + " , objVal: " + objVal);
                     fieldMap.get(parameter).set(this, objVal);
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
@@ -318,15 +325,23 @@ public abstract class Sprite {
             }
             else
             {
-//                System.out.println("Unknown field (" + parameter + "=" + value +")");
+                System.out.println("Unknown field (" + parameter + "=" + value +")");
             }
         }
 		
+        
   	}
 	
 	
 	public String toString() {
 		return "Sprite: " + name + " (" + id + ")" + ", groupId: " + groupId + ", pos: " + position + ", lastPos: " + lastPosition;
+	}
+
+
+	public void loadColor() {
+		
+		
+		
 	}
 		
 //		Sprite sp = null;
