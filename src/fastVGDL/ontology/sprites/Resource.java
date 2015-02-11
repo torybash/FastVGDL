@@ -14,7 +14,7 @@ import fastVGDL.tools.Vector2i;
 public class Resource extends Passive
 {
     public int value;
-    public int limit;
+    public int limit = 100;
     public int resource_type;
     public String resource_name;
 

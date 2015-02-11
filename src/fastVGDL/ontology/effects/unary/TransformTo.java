@@ -31,12 +31,18 @@ public class TransformTo extends Interaction {
     @Override
     public void execute(Sprite sprite1, Sprite sprite2, Game game)
     {
+    	super.hasInteracted(sprite1, sprite2);
     	SpriteDefinition sd = VGDLRegistry.GetInstance().getRegisteredSpriteDefinition(stype);
     	
     	Sprite transformedSprite = game.addSprite(sd, sprite1.position.x, sprite1.position.y);
     	
     	transformedSprite.lastPosition.x = sprite1.lastPosition.x;
     	transformedSprite.lastPosition.y = sprite1.lastPosition.y;
+    	
+    	if (sprite1.isAvatar){
+    		transformedSprite.isAvatar = true;
+    		game.avatarSprite = transformedSprite;
+    	}
     	
     	game.killSprite(sprite1);
     	

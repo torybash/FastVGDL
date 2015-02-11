@@ -1,9 +1,9 @@
 package fastVGDL.ontology.effects.binary;
 
+import fastVGDL.core.game.Game;
 import fastVGDL.ontology.core.Sprite;
 import fastVGDL.ontology.effects.Interaction;
-import fastVGDL.parsing.core.Node;
-import fastVGDL.core.game.Game;
+import fastVGDL.parsing.core.VGDLRegistry;
 
 /**
  * Created with IntelliJ IDEA.
@@ -28,8 +28,12 @@ public class KillIfOtherHasMore extends Interaction
     @Override
     public void execute(Sprite sprite1, Sprite sprite2, Game game)
     {
+    	super.hasInteracted(sprite1, sprite2);
         //If 'sprite2' has more than a limit of the resource type given, sprite dies.
-//        if(sprite2.getAmountResource(resourceId) >= limit)
-//            game.killSprite(sprite1);
+    	
+    	 resourceId = VGDLRegistry.GetInstance().getRegisteredSpriteId(resource);
+    	
+        if(sprite2.getAmountResource(resourceId) >= limit)
+            game.killSprite(sprite1);
     }
 }

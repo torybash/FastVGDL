@@ -22,6 +22,7 @@ public class TeleportToExit extends Interaction
     @Override
     public void execute(Sprite sprite1, Sprite sprite2, Game game)
     {
+    	super.hasInteracted(sprite1, sprite2);
 //        int destinationId = VGDLFactory.GetInstance().requestFieldValueInt(sprite2, "itype");
 //
 //        Collection<VGDLSprite> sprites = game.getSprites(destinationId).values();

@@ -21,6 +21,7 @@ public class StepBack extends Interaction
     @Override
     public void execute(Sprite sprite1, Sprite sprite2, Game game)
     {
+    	super.hasInteracted(sprite1, sprite2);
 //    	System.out.println(sprite1.name + " should step back! pos: " + sprite1.position + " , last pos: "+ sprite1.lastPosition);
     	sprite1.position.x = sprite1.lastPosition.x;
     	sprite1.position.y = sprite1.lastPosition.y;

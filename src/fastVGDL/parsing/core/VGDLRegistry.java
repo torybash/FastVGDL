@@ -22,6 +22,8 @@ public class VGDLRegistry {
 	}
 	
 	public int getRegisteredSpriteId(String stype) {
+//		System.out.println(spriteNameToId);
+//		System.out.println(stype);
 		return spriteNameToId.get(stype);
 	}
 	

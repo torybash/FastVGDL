@@ -116,6 +116,8 @@ public class Agent extends AbstractPlayer{
                 System.out.println("*********ITERATION " + numIters + " ********");
                 if (n.list.size() > 0) System.out.println("best current node: " + n);
             }
+            
+            if (n.fwdModel.avatarSprite == null) continue;
            
 
             if (n.fwdModel.won){

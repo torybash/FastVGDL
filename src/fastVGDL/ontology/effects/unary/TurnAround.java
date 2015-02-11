@@ -21,6 +21,7 @@ public class TurnAround extends Interaction
     @Override
     public void execute(Sprite sprite1, Sprite sprite2, Game game)
     {
+    	super.hasInteracted(sprite1, sprite2);
 //        sprite1.setRect(sprite1.lastrect);
 //        sprite1.lastmove = sprite1.cooldown;
 //        sprite1.physics.activeMovement(sprite1, Types.DOWN, sprite1.speed);

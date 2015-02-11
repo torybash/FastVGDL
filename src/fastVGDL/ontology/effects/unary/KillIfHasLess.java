@@ -3,6 +3,7 @@ package fastVGDL.ontology.effects.unary;
 import fastVGDL.ontology.core.Sprite;
 import fastVGDL.ontology.effects.Interaction;
 import fastVGDL.parsing.core.Node;
+import fastVGDL.parsing.core.VGDLRegistry;
 import fastVGDL.core.game.Game;
 
 /**
@@ -22,13 +23,16 @@ public class KillIfHasLess extends Interaction
     {
         is_kill_effect = true;
         resourceId = -1;
-//        resourceId = VGDLRegistry.GetInstance().getRegisteredSpriteValue(resource);
+//        resourceId = VGDLRegistry.GetInstance().getRegisteredSpriteId(resource);
     }
 
     @Override
     public void execute(Sprite sprite1, Sprite sprite2, Game game)
     {
-//        if(sprite1.getAmountResource(resourceId) <= limit)
-//            game.killSprite(sprite1);
+    	super.hasInteracted(sprite1, sprite2);
+    	resourceId = VGDLRegistry.GetInstance().getRegisteredSpriteId(resource);
+    	
+        if(sprite1.getAmountResource(resourceId) <= limit)
+            game.killSprite(sprite1);
     }
 }

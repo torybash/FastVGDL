@@ -22,13 +22,23 @@ public class ForwardModel extends Game{
 		blockSize = game.blockSize;
 		levelSize = game.levelSize;
 		
+		numSprites = game.numSprites;
+		
+		resources_limits = game.resources_limits;
+		
 //		avatarSprite = game.avatarSprite.copy();
 		
 		spriteGroups = new SpriteGroup[game.spriteGroups.length];
 		for (int i = 0; i < spriteGroups.length; i++) {
 			SpriteGroup sg = game.spriteGroups[i].copy();
 			spriteGroups[i] = sg;
-			if (sg.isAvatar && sg.sprites.size() > 0) avatarSprite = sg.sprites.get(0);
+			if (sg.isAvatar && sg.sprites.size() > 0){
+				for (Sprite sp :  sg.sprites.values()) {
+					avatarSprite = sp;
+					break;
+				}
+				
+			}
 		}
 		
 		visuals = false;
@@ -78,8 +88,8 @@ public class ForwardModel extends Game{
 	}
 
 	private void spriteUpdates(ACTIONS act) {
-		
 		avatarSprite.performActiveMovement(act);
+		if (act != ACTIONS.ACTION_NIL) numActions++;
 		
 		for (int i = 0; i < spriteGroups.length; i++) {
 			SpriteGroup sg = spriteGroups[i];

@@ -21,6 +21,7 @@ public class ReverseDirection extends Interaction
     @Override
     public void execute(Sprite sprite1, Sprite sprite2, Game game)
     {
+    	super.hasInteracted(sprite1, sprite2);
 //        game.reverseDirection(sprite1);
     }
 }

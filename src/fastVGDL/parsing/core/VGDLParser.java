@@ -98,7 +98,7 @@ public class VGDLParser {
 
         game.gamePath = gamedesc_file;
                 
-        String[] desc_lines = new IO().readFile(gamedesc_file);
+        String[] desc_lines = new IO().getDescLinesFromFile(gamedesc_file);
         
         currentSet = 0;
 	currID = 0;
@@ -424,7 +424,7 @@ public class VGDLParser {
 
 
     public void parseLevel(Game game, String level_desc) {
-        String[] lines = new IO().readFile(level_desc);
+        String[] lines = new IO().getDescLinesFromFile(level_desc);
         
         if(lines == null) throw new RuntimeException();
             
@@ -454,7 +454,7 @@ public class VGDLParser {
          int[] result = new int[2];
          
          
-        String[] desc_lines = new IO().readFile(gamePath);
+        String[] desc_lines = new IO().getDescLinesFromFile(gamePath);
         
         ArrayList<SpriteDefinition> spriteDefinitions = null;
         ArrayList<Interaction> interactions = null;

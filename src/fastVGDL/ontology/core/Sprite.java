@@ -47,6 +47,11 @@ public abstract class Sprite {
     Image image;
     public Color color;
     
+    
+    public boolean hasInteracted = false;
+    
+    HashMap<Integer, Integer> resources = new HashMap<Integer, Integer>();
+    
     public void update(Game game){
     	lastPosition.x = position.x;
     	lastPosition.y = position.y;
@@ -267,6 +272,7 @@ public abstract class Sprite {
 		targetSprite.isAvatar = isAvatar;
 		targetSprite.orientation = orientation;
 		targetSprite.color = color;
+		targetSprite.hasInteracted = hasInteracted;
 	}
 
 
@@ -334,7 +340,7 @@ public abstract class Sprite {
 	
 	
 	public String toString() {
-		return "Sprite: " + name + " (" + id + ")" + ", groupId: " + groupId + ", pos: " + position + ", lastPos: " + lastPosition;
+		return "{Sprite: " + this.getClass().getSimpleName() + ", name: " + name + " (" + id + ")" + ", groupId: " + groupId + ", pos: " + position + ", lastPos: " + lastPosition + "}";
 	}
 
 
@@ -342,6 +348,22 @@ public abstract class Sprite {
 		
 		
 		
+	}
+
+
+	public int getAmountResource(int resourceId) {
+//		System.out.println("Get resources - of sprite: " + this.getClass().getSimpleName() + " : " + resources);
+//		System.out.println("want: " + resourceId);
+		if (resources.get(resourceId) == null) return 0;
+		return resources.get(resourceId);
+	}
+
+
+	public void modifyResource(int resourceId, int amount_delta) {
+//		System.out.println("Modyfying resource " + resourceId + " amount: " + amount_delta);
+        int prev = getAmountResource(resourceId);
+        int next = Math.max(0,prev + amount_delta);
+        resources.put(resourceId, next);
 	}
 		
 //		Sprite sp = null;

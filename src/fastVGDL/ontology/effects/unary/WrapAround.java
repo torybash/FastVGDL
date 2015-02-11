@@ -22,7 +22,7 @@ public class WrapAround extends Interaction {
 
     @Override
     public void execute(Sprite sprite1, Sprite sprite2, Game game) {
-
+    	super.hasInteracted(sprite1, sprite2);
 //        if(sprite1.orientation.x > 0)
 //        {
 //            sprite1.rect.x = (int) (offset * sprite1.rect.width);

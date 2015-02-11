@@ -26,9 +26,9 @@ public class Types {
 //    public static final Vector2d NIL = new Vector2d(-1, -1);
 //
 //    public static final Vector2d NONE = new Vector2d(0, 0);
-    public static final int UP = 0;
+    public static final int DOWN = 0;
     public static final int RIGHT = 1;
-    public static final int DOWN = 2;
+    public static final int UP = 2;
     public static final int LEFT = 3;
 //
 //    public static final Vector2d[] BASEDIRS = new Vector2d[]{UP, LEFT, DOWN, RIGHT};

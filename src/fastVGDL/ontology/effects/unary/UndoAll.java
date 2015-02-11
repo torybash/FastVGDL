@@ -22,6 +22,7 @@ public class UndoAll extends Interaction
     @Override
     public void execute(Sprite sprite1, Sprite sprite2, Game game)
     {
+    	super.hasInteracted(sprite1, sprite2);
 //    	System.out.println("undoAll!");
     	for (int i = 0; i < game.spriteGroups.length; i++) {
 			SpriteGroup sg = game.spriteGroups[i];

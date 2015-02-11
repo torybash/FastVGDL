@@ -24,4 +24,13 @@ public abstract class Interaction
     
     public abstract void execute(Sprite sprite1, Sprite sprite2, Game game);
 
+	public void hasInteracted(Sprite sprite1) {
+		sprite1.hasInteracted = true;
+	}
+    
+	public void hasInteracted(Sprite sprite1, Sprite sprite2) {
+		sprite1.hasInteracted = true;
+		if (sprite2 != null) sprite2.hasInteracted = true;
+	}
+
 }

@@ -22,6 +22,7 @@ public class CollectResource extends Interaction
     @Override
     public void execute(Sprite sprite1, Sprite sprite2, Game game) {
 
+    	super.hasInteracted(sprite1, sprite2);
 //        if(sprite1.is_resource)
 //        {
 //            Resource r = (Resource) sprite1;

@@ -3,6 +3,7 @@ package fastVGDL.ontology.effects.unary;
 import fastVGDL.ontology.core.Sprite;
 import fastVGDL.ontology.effects.Interaction;
 import fastVGDL.parsing.core.Node;
+import fastVGDL.parsing.core.VGDLRegistry;
 import fastVGDL.core.game.Game;
 
 /**
@@ -16,21 +17,25 @@ public class ChangeResource extends Interaction
 {
     public String resource;
     public int resourceId;
-    public int value;
+    public int value = 1;
 
     public ChangeResource()
     {
-        value=1;
+//        value=1;
         resourceId = -1;
-//        resourceId = VGDLRegistry.GetInstance().getRegisteredSpriteValue(resource);
+       
     }
 
     @Override
     public void execute(Sprite sprite1, Sprite sprite2, Game game) {
-//        int numResources = sprite1.getAmountResource(resourceId);
-//        if(numResources + value <= game.getResourceLimit(resourceId))
-//        {
-//            sprite1.modifyResource(resourceId, value);
-//        }
+    	super.hasInteracted(sprite1, sprite2);
+    	
+    	 resourceId = VGDLRegistry.GetInstance().getRegisteredSpriteId(resource);
+    	
+        int numResources = sprite1.getAmountResource(resourceId);
+        if(numResources + value <= game.getResourceLimit(resourceId))
+        {
+            sprite1.modifyResource(resourceId, value);
+        }
     }
 }

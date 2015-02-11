@@ -10,6 +10,7 @@ import fastVGDL.ontology.core.Sprite;
 import fastVGDL.ontology.core.SpriteDefinition;
 import fastVGDL.ontology.core.Termination;
 import fastVGDL.ontology.effects.Interaction;
+import fastVGDL.ontology.sprites.Resource;
 import fastVGDL.parsing.core.SpriteGroup;
 import fastVGDL.tools.JEasyFrame;
 import fastVGDL.tools.KeyInput;
@@ -43,7 +44,7 @@ public class Game {
 	ArrayList<Sprite> killList = new ArrayList<Sprite>();
 	
 	
-
+	protected int[] resources_limits;
 		
 	final int STANDARD_DELAY = 50;
 	final int MAX_GAME_TICKS = 2000000;
@@ -57,6 +58,9 @@ public class Game {
 	public int numSprites = 0;
 	public int numActions = 0;
 	public int numInteractions = 0;
+	public int numSpritesHasInteracted = 0;
+	public int numSpritesKilled = 0;
+	public int numSpritesCreated = 0;
 	
 	public Game(){}
 	
@@ -73,13 +77,29 @@ public class Game {
 		this.terms = terms;
 		
 		spriteGroups = new SpriteGroup[spritesDefinitions.size()];
+		resources_limits = new int[spritesDefinitions.size()];
 		
+		ArrayList<Resource> resources = new ArrayList<Resource>();
         for(int i = 0; i < spritesDefinitions.size(); ++i){
         	SpriteDefinition sd = spritesDefinitions.get(i);
         	spriteGroups[sd.id] = new SpriteGroup(sd.id, sd.childIds);
         	spriteGroups[sd.id].leafNode = sd.leafNode;
         	spriteGroups[sd.id].isAvatar = sd.isAvatar;
+        	
+        	if (sd.defaultSprite != null && sd.defaultSprite.getClass().getSimpleName().equals("Resource")){
+        		Resource res = (Resource) sd.defaultSprite;
+        		res.id = sd.id;
+        		resources.add(res);
+        	}
         }
+        
+        for (Resource res : resources) {
+			resources_limits[res.id] = res.limit;
+		}
+        
+        
+        
+        
         
         isEnded = false;
   	}
@@ -298,7 +318,10 @@ public class Game {
 					if (sp1.position.x < 0 || sp1.position.x >= levelSize.x || sp1.position.y < 0 || sp1.position.y >= levelSize.y){
 //							System.out.println("Interaction execute!: " + inter.getClass().getSimpleName() + ", " + inter.id1 + " - " + inter.id2);
 //							System.out.println(sp1.name + "("+sp1.id+")" + " colliding with EOS");
+						if (!sp1.hasInteracted) numSpritesHasInteracted++;
+						numInteractions++;
 						inter.execute(sp1, null, this);
+						
 					}
 				}
 			}else if (spriteGroups[inter.id2].leafNode){
@@ -321,8 +344,11 @@ public class Game {
 					if (sp1 != sp2 && sp1.position.x == sp2.position.x && sp1.position.y == sp2.position.y){
 //						System.out.println("Interaction execute!: " + inter.getClass().getSimpleName() + ", " + inter.id1 + " - " + inter.id2);
 //						System.out.println(sp1.name + "("+sp1.id+")" + " colliding with " + sp2.name + "("+sp2.id+")");
-						inter.execute(sp1, sp2, this);
 						numInteractions++;
+						if (!sp1.hasInteracted) numSpritesHasInteracted++;
+						if (!sp2.hasInteracted) numSpritesHasInteracted++;
+						inter.execute(sp1, sp2, this);
+
 						if (killList.contains(sp1)) break;
 					}
 				}
@@ -360,6 +386,7 @@ public class Game {
 	}
 
 	public void killSprite(Sprite sprite) {
+		numSpritesKilled++;
 		killList.add(sprite);		
 	}
 	
@@ -371,7 +398,11 @@ public class Game {
 //		System.out.println("Num sprites: " + numSprites);
 //                System.out.println("adding sprite -- sd.defaultSprite " + sd.defaultSprite);
             
+//		System.out.println("sd.defaultSprite: " + sd.defaultSprite);
+		
 		Sprite sp = sd.defaultSprite.copy();
+		
+//		System.out.println("tha sp: " + sp);
 //		try {
 //			Constructor spriteConstructor = sd.spriteClass.getConstructor();
 //			sp = (Sprite) spriteConstructor.newInstance();
@@ -382,7 +413,8 @@ public class Game {
 		sp.name = sd.spriteName;
 		sp.position = new Vector2i(x, y);
 		sp.lastPosition = sp.position.copy();
-
+		if (visuals) sp.img = sd.parameters.get("img");
+		
 		spriteGroups[sd.id].addSprite(sp);
 		spriteGroups[sd.id].leafNode = sd.leafNode;
 		
@@ -397,11 +429,11 @@ public class Game {
 //		sp.parseParameters(sd.parameters);
 		
 		if (visuals){
-			sp.loadImage(sd.parameters.get("img"));
+			sp.loadImage(sp.img);
 		}
 		
 		numSprites++;
-		
+		numSpritesCreated++;
 		return sp;
 	}
 
@@ -471,5 +503,9 @@ public class Game {
     
     
     }
+
+	public int getResourceLimit(int resourceId) {
+		return resources_limits[resourceId];
+	}
 	
 }

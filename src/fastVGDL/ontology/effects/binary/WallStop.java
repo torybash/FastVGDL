@@ -27,6 +27,7 @@ public class WallStop extends Interaction
     @Override
     public void execute(Sprite sprite1, Sprite sprite2, Game game)
     {
+    	super.hasInteracted(sprite1, sprite2);
         // Stop just in front of the wall, removing that velocity component, but possibly sliding along it.
 
         //Keep in the list, for the current cycle, the sprites that have triggered this event.

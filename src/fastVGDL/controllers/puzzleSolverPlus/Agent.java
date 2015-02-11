@@ -14,6 +14,7 @@ import fastVGDL.tools.ElapsedCpuTimer.TimerType;
 import fastVGDL.tools.Vector2i;
 import fastVGDL.core.game.ForwardModel;
 import fastVGDL.core.game.Game;
+import fastVGDL.core.game.results.GameResults;
 import fastVGDL.core.player.AbstractPlayer;
 
 public class Agent extends AbstractPlayer{
@@ -34,11 +35,12 @@ public class Agent extends AbstractPlayer{
     final int MAX_VISITED_NODES = 5000000;
     final int MAX_QUEUE_SIZE = 2000000;
 	
-    final boolean VERBOSE = true;
+    final boolean VERBOSE = false;
     final boolean LOOP_VERBOSE = false;
     
     final boolean depthFirst = false;
     final boolean lowMemoryApproach = true;
+    final boolean findAllSolutions = false;
     
     boolean[] wallPositions;
     
@@ -47,6 +49,8 @@ public class Agent extends AbstractPlayer{
     
     //TEST
     int[] solutionTest = null;
+    
+    ArrayList<Node> solutions;
     
     private void initialize(Game game){
     	ArrayList<ACTIONS> act = game.getAvailableActions();
@@ -70,6 +74,8 @@ public class Agent extends AbstractPlayer{
             }
         }
 
+        if (findAllSolutions) solutions = new ArrayList<Node>();
+        
         initialized = true;
     }
         
@@ -77,7 +83,7 @@ public class Agent extends AbstractPlayer{
         if (VERBOSE) System.out.println("Puzzlesolver plus acting----");
         
         if (!initialized)  initialize(game);
-        
+
         if (foundSolution) return actions[solution.get(++solutionIndex)];
 
         if (q.isEmpty()){
@@ -102,6 +108,8 @@ public class Agent extends AbstractPlayer{
         	
             if (q.isEmpty()){
                 if (VERBOSE) System.out.println("QUEUE EMPTY!!!");
+                
+                if (findAllSolutions) printSolutions(game);
                 game.isEnded = true;
                 return ACTIONS.ACTION_NIL; 
             }
@@ -131,7 +139,7 @@ public class Agent extends AbstractPlayer{
                 //if current state contains flickers, advance with nil action
                 while (stateContainsFlickers(currentState)){
 //                    System.out.println("STATE CONTAINS FLICKERS!!!!!!!!!!!");
-//                     ystem.out.println("moveables: " + getMoveables(currentState));
+//                    System.out.println("moveables: " + getMoveables(currentState));
 
                     currentState.advance(ACTIONS.ACTION_NIL);
                 }
@@ -171,11 +179,9 @@ public class Agent extends AbstractPlayer{
 
 
             if (!nodeAlreadyExists){
-                boolean gameLost = false;
+                boolean gameOver = false;
                 if (currentState.isEnded){
                     if (currentState.won){
-                        solution = n.list;
-                        foundSolution = true;
                         if (VERBOSE){ 
                             System.out.println("FOUND SOLUTION!");
                             System.out.println("Avatar pos: " + currentState.avatarSprite.position);
@@ -185,14 +191,21 @@ public class Agent extends AbstractPlayer{
                             System.out.println("Queue size: " + q.size());
                             System.out.println("Moveables: " + n.moveables);
                         }
-                        return actions[solution.get(solutionIndex)];
+                        if (findAllSolutions){
+                        	solutions.add(n);
+                        	gameOver = true;
+                        }else{
+                            solution = n.list;
+                            foundSolution = true;
+                        	return actions[solution.get(solutionIndex)];
+                        }
                     }else{
-                        gameLost = true;
+                        gameOver = true;
                     }
                 }
 
                 //Expansion
-                if (!gameLost){
+                if (!gameOver){
                     if (solutionTest != null){
                         Node n_new = new Node(n.list, n.moveables, solutionTest[solutionIndex]);
                         q.add(n_new);
@@ -251,7 +264,19 @@ public class Agent extends AbstractPlayer{
 
 
 
-    private void wasteTime(float factor) {
+    private void printSolutions(Game game) {
+		for (Node n : solutions) {
+			ForwardModel stateCopy = playbackActions(new ForwardModel(game), n.list);
+	
+			 GameResults results = new GameResults(stateCopy);
+
+			 System.out.println("Printing results: " +results);
+			 System.out.println("----------------");
+		}
+		
+	}
+
+	private void wasteTime(float factor) {
         System.out.println("COULDN'T FIND SOLUTION FOR GAME - WASTING TIME");
         int c = 0;
         for (int i = 0; i < 10000000 * factor; i++) {

@@ -26,10 +26,10 @@ public class SpriteProducer extends Sprite
 //        this.parseParameters(cnt);
 //    }
 
-	public void update(Game game) {
-		
-		
-	}
+//	public void update(Game game) {
+//		
+//		
+//	}
 //    protected void loadDefaults()
 //    {
 //        super.loadDefaults();

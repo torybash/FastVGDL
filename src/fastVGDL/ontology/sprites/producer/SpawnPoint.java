@@ -1,5 +1,6 @@
 package fastVGDL.ontology.sprites.producer;
 
+import fastVGDL.ontology.core.Sprite;
 import fastVGDL.parsing.core.VGDLRegistry;
 import fastVGDL.core.game.Game;
 
@@ -55,6 +56,8 @@ public class SpawnPoint extends SpriteProducer
 
     public void update(Game game)
     {
+//        System.out.println("Total: " + total + " , counter: " + counter);
+
 //        if((game.gametick % cooldown == 0) && game.getRandomGenerator().nextFloat() < prob)
         if((game.gametick % cooldown == 0))
         {
@@ -64,7 +67,6 @@ public class SpawnPoint extends SpriteProducer
 
         super.update(game);
 
-//        System.out.println("Total: " + total + " , counter: " + counter);
         if(total > 0 && counter >= total)
         {
         	System.out.println("SPAWN POINT DYING");
@@ -89,5 +91,20 @@ public class SpawnPoint extends SpriteProducer
 //        targetSprite.itype = this.itype;
 //        super.copyTo(targetSprite);
 //    }
+    
+    public Sprite copy()
+    {
+    	SpawnPoint newSprite = new SpawnPoint();
+        this.copyTo(newSprite);
+        
+        newSprite.stype = stype;
+        
+        return newSprite;
+    }
 
+    public void copyTo(Sprite target)
+    {
+    	SpawnPoint targetSprite = (SpawnPoint) target;
+        super.copyTo(targetSprite);
+    }
 }

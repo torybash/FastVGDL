@@ -28,10 +28,13 @@ public class SpawnIfHasMore  extends Interaction {
     @Override
     public void execute(Sprite sprite1, Sprite sprite2, Game game)
     {
+    	super.hasInteracted(sprite1, sprite2);
     	SpriteDefinition sd = VGDLRegistry.GetInstance().getRegisteredSpriteDefinition(stype);
+    	
+    	resourceId =  VGDLRegistry.GetInstance().getRegisteredSpriteId(resource);
 //    	if(game.getRandomGenerator().nextDouble() >= prob) return;
     	
-//        if(sprite1.getAmountResource(resourceId) >= limit)
+        if(sprite1.getAmountResource(resourceId) >= limit)
         {
             game.addSprite(sd, sprite1.position.x, sprite1.position.y);
         }

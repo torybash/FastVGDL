@@ -28,7 +28,9 @@ public class KillIfHasMore extends Interaction
     @Override
     public void execute(Sprite sprite1, Sprite sprite2, Game game)
     {
-//        if(sprite1.getAmountResource(resourceId) >= limit)
+    	super.hasInteracted(sprite1, sprite2);
+    	
+    	//        if(sprite1.getAmountResource(resourceId) >= limit)
 //            game.killSprite(sprite1);
     }
 }

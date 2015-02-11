@@ -21,7 +21,9 @@ public class FlipDirection extends Interaction
 
     @Override
     public void execute(Sprite sprite1, Sprite sprite2, Game game)
+    
     {
-//        sprite1.orientation = (Vector2d) Utils.choice(Types.BASEDIRS, game.getRandomGenerator());
+    	super.hasInteracted(sprite1, sprite2);
+    	//        sprite1.orientation = (Vector2d) Utils.choice(Types.BASEDIRS, game.getRandomGenerator());
     }
 }
