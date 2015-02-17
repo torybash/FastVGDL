@@ -55,7 +55,7 @@ public class MovingAvatar extends Sprite {
         
         Vector2i action2D = Utils.processMovementActionKeys(action);
       
-        super.move(action2D);
+        super.move(action2D, game);
 		
 	}
 

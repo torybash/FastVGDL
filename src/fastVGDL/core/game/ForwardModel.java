@@ -88,7 +88,7 @@ public class ForwardModel extends Game{
 	}
 
 	private void spriteUpdates(ACTIONS act) {
-		avatarSprite.performActiveMovement(act);
+		avatarSprite.performActiveMovement(act, this);
 		if (act != ACTIONS.ACTION_NIL) numActions++;
 		
 		for (int i = 0; i < spriteGroups.length; i++) {

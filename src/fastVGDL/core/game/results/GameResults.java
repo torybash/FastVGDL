@@ -18,6 +18,8 @@ public class GameResults {
 	public int numSpritesKilled;
 	public int numberWalls;
 	
+	public int numberSpritesMoved;
+	
 	public int visitedNodes;
 	public int possibleSolutions;
 	
@@ -31,6 +33,7 @@ public class GameResults {
 		numSpritesHasInteracted = game.numSpritesHasInteracted;
 		numSpritesKilled = game.numSpritesKilled;
 		numSpritesCreated = game.numSpritesCreated;
+		numberSpritesMoved = game.numberSpritesMoved;
 		
 		for (int i = 0; i < game.spriteGroups.length; i++) {
 			SpriteGroup sg = game.spriteGroups[i];
@@ -46,7 +49,7 @@ public class GameResults {
 	public String toString() {
 		String result = "{GameResults: won " + won + ", ticks: " + ticks + ", actions: " + actions + ", interactions: " + interactions + 
 				", numberSprites: " + numberSprites + ", numSpritesHasInteracted: " + numSpritesHasInteracted + ", numberWalls: " + numberWalls +
-				", numSpritesCreated: " + numSpritesCreated + ", numSpritesKilled: " + numSpritesKilled + "}";
+				", numSpritesCreated: " + numSpritesCreated + ", numSpritesKilled: " + numSpritesKilled + ", numberSpritesMoved: " + numberSpritesMoved + "}";
 		return result;
 	}
 }

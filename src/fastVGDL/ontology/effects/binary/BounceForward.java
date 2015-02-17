@@ -26,7 +26,7 @@ public class BounceForward extends Interaction
     	
     	Vector2i dir = sprite2.getDirection();
     	
-    	sprite1.move(dir);
+    	sprite1.move(dir, game);
 //        Vector2d dir = new Vector2d(sprite2.lastDirection());
 //        dir.normalise();
 //

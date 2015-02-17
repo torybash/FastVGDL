@@ -46,7 +46,8 @@ public abstract class Sprite {
     Vector2i direction = new Vector2i();
     Image image;
     public Color color;
-    
+    public boolean singleton;
+    public int cooldown;
     
     public boolean hasInteracted = false;
     
@@ -58,8 +59,10 @@ public abstract class Sprite {
     }
     
     
-    public void move(Vector2i action2d){
+    public void move(Vector2i action2d, Game game){
     	position.add(action2d);
+    	
+    	if (!isAvatar) game.numberSpritesMoved++;	
     }
 	
     /**
@@ -243,12 +246,12 @@ public abstract class Sprite {
     }
 
     
-    public void performActiveMovement(ACTIONS act)
+    public void performActiveMovement(ACTIONS act, Game game)
     {
         lastPosition.x = position.x;
         lastPosition.y = position.y;
         Vector2i action2D = Utils.processMovementActionKeys(act);
-        move(action2D);
+        move(action2D, game);
     }
 
 	public Vector2i getDirection() {

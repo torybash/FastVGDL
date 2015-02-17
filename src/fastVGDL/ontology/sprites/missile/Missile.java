@@ -59,7 +59,7 @@ public class Missile extends Sprite
 			break;
 		}
 		
-		move(moveVector);
+		move(moveVector, game);
 		
 	}
 

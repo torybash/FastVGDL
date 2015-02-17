@@ -34,7 +34,7 @@ public class SpawnIfHasMore  extends Interaction {
     	resourceId =  VGDLRegistry.GetInstance().getRegisteredSpriteId(resource);
 //    	if(game.getRandomGenerator().nextDouble() >= prob) return;
     	
-        if(sprite1.getAmountResource(resourceId) >= limit)
+        if(resourceId == -1 || sprite1.getAmountResource(resourceId) >= limit)
         {
             game.addSprite(sd, sprite1.position.x, sprite1.position.y);
         }

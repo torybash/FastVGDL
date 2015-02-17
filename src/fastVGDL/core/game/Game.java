@@ -61,6 +61,8 @@ public class Game {
 	public int numSpritesHasInteracted = 0;
 	public int numSpritesKilled = 0;
 	public int numSpritesCreated = 0;
+
+	public int numberSpritesMoved;
 	
 	public Game(){}
 	
@@ -433,7 +435,7 @@ public class Game {
 		}
 		
 		numSprites++;
-		numSpritesCreated++;
+		if (gametick > 0) numSpritesCreated++;
 		return sp;
 	}
 
