@@ -10,11 +10,15 @@ import fastVGDL.core.player.AbstractPlayer;
 public class Test {
     public static void main(String[] args) {
 
-        String game_title = "realsokoban";
-        int level = 3;
+        String game_title = "genpuzzler";
+        int level = 0;
 
         String game_desc = "../gvgai/examples/gridphysics/"+game_title+".txt";
         String level_desc = "../gvgai/examples/gridphysics/"+game_title+"_lvl"+level+".txt";
+        
+        game_desc = "../GameChanger/rnd_gen_puzzle_games/"+game_title+".txt";
+        level_desc = "../GameChanger/rnd_gen_puzzle_games/"+game_title+"_lvl"+level+".txt";
+        
 //        String level_desc = "../gvgai/examples/puzzlegames/realsokoban_orig/"+game_title+"_lvl"+level+".txt";
         
         String puzzleController = "fastVGDL.controllers.puzzleSolverPlus.Agent";

@@ -32,7 +32,7 @@ public class Agent extends AbstractPlayer{
     ArrayDeque<Node> q = new ArrayDeque<Node>();
     HashSet<Node> visitedNodes = new HashSet<Node>();
     
-    final int MAX_VISITED_NODES = 5000000;
+    final int MAX_VISITED_NODES = 500000;
     final int MAX_QUEUE_SIZE = 2000000;
 	
     final boolean VERBOSE = false;
@@ -137,12 +137,26 @@ public class Agent extends AbstractPlayer{
                 
                 
                 //if current state contains flickers, advance with nil action
+                int cnt = 0;
                 while (stateContainsFlickers(currentState)){
 //                    System.out.println("STATE CONTAINS FLICKERS!!!!!!!!!!!");
 //                    System.out.println("moveables: " + getMoveables(currentState));
 
                     currentState.advance(ACTIONS.ACTION_NIL);
+                    cnt++;
+                    if (cnt == 10){
+                    	System.out.println("FLICKERS KEEP POPPING UP!");
+                        game.isEnded = true;
+                        return ACTIONS.ACTION_NIL; 
+                    }
                 }
+                
+                if (visitedNodes.size() > MAX_VISITED_NODES){
+                	System.out.println("TOO MANY VISITED NODES - GIVING UP!");
+                    game.isEnded = true;
+                    return ACTIONS.ACTION_NIL; 
+                }
+                
             }else{
             	currentState = fm;
             }
@@ -293,8 +307,9 @@ public class Agent extends AbstractPlayer{
             for (Integer groupId : sg.sprites.keySet()) {
                 Sprite sp = sg.sprites.get(groupId);
 
+
                 if (!sp.isAvatar && !sp.name.equals("wall") && !sp.name.equals("ground")){
-                    result.add(new Moveable(sp.position, sp.id));
+                    result.add(new Moveable(sp.position.copy(), sp.id, sp.groupId));
                 }
             }
         }
