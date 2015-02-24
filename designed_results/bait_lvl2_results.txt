@@ -1,0 +1,1 @@
+{GameResults: won false, ticks: 3546, actions: 0, interactions: 0, numberSprites: 89, numSpritesHasInteracted: 0, numberWalls: 60, numSpritesCreated: 0, numSpritesKilled: 0, numberSpritesMoved: 0}

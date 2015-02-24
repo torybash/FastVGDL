@@ -1,5 +1,6 @@
 import fastVGDL.parsing.core.VGDLFactory;
 import fastVGDL.parsing.core.VGDLParser;
+import fastVGDL.tools.IO;
 import fastVGDL.core.game.Game;
 import fastVGDL.core.game.GamePlayer;
 import fastVGDL.core.game.results.GameResults;
@@ -8,43 +9,72 @@ import fastVGDL.core.player.AbstractPlayer;
 
 
 public class Test {
+	
+	  private static final long MEGABYTE = 1024L * 1024L;
+
+	  public static long bytesToMegabytes(long bytes) {
+	    return bytes / MEGABYTE;
+	  }
+	
     public static void main(String[] args) {
 
-        String game_title = "genpuzzler";
-        int level = 0;
-
-        String game_desc = "../gvgai/examples/gridphysics/"+game_title+".txt";
-        String level_desc = "../gvgai/examples/gridphysics/"+game_title+"_lvl"+level+".txt";
+    	String dataFolder = "designed_results/";
+    	
+        String game_title = "portals";
+        int level = 9;
         
-        game_desc = "../GameChanger/rnd_gen_puzzle_games/"+game_title+".txt";
-        level_desc = "../GameChanger/rnd_gen_puzzle_games/"+game_title+"_lvl"+level+".txt";
+        String gvgaiGames = "../gvgai/examples/gridphysics/";
+
+        String game_desc = gvgaiGames + game_title+".txt";
+        String level_desc = gvgaiGames + game_title+"_lvl"+level+".txt";
+        
+//        game_desc = "../GameChanger/rnd_gen_puzzle_games/"+game_title+".txt";
+//        level_desc = "../GameChanger/rnd_gen_puzzle_games/"+game_title+"_lvl"+level+".txt";
+//        game_desc = "../GameChanger/evolPuzzleGames/21;02,04;25/"+game_title+".txt";
+//        level_desc = "../GameChanger/evolPuzzleGames/21;02,04;25/"+game_title+"_lvl"+level+".txt";
+        
         
 //        String level_desc = "../gvgai/examples/puzzlegames/realsokoban_orig/"+game_title+"_lvl"+level+".txt";
         
         String puzzleController = "fastVGDL.controllers.puzzleSolverPlus.Agent";
+        String puzzleLowMemController = "fastVGDL.controllers.puzzleSolverPlusLowMem.Agent";
         String humanController = "fastVGDL.controllers.human.Agent";
         String bestFirstController = "fastVGDL.controllers.bestFirst.Agent";
         
-        GameResults results = GamePlayer.playGame(game_desc, level_desc, puzzleController, true);
         
+        
+        //1. Play a game and get results
+//        long tim = System.currentTimeMillis();
+        GameResults results = GamePlayer.playGame(game_desc, level_desc, puzzleController, true);
         System.out.println(results);
-//        String game_desc = "../gvgai/examples/gridphysics/"+game_title+".txt";
-//        String level_desc = "../gvgai/examples/gridphysics/"+game_title+"_lvl"+level+".txt";
-//
-//        Game game = VGDLParser.GetInstance().parseGame(game_desc);
-//
-//        game.visuals = true;
-//        VGDLParser.GetInstance().parseLevel(game, level_desc);
-//
-//        AbstractPlayer humanPlayer = VGDLFactory.GetInstance().createController("controllers.human.Agent");
-//        AbstractPlayer puzzlePlayer = VGDLFactory.GetInstance().createController("controllers.puzzleSolverPlus.Agent");
-//        AbstractPlayer bestFirstPlayer = VGDLFactory.GetInstance().createController("controllers.bestFirst.Agent");
-//
-//        game.playGameWithGraphics(puzzlePlayer);
-//                game.playGameWithGraphics(bestFirstPlayer);
-//		game.playGameWithGraphics(humanPlayer);
-//		game.playGame(puzzlePlayer);
-
+        
+        
+//        System.out.println("time: " + (System.currentTimeMillis() - tim));
+        // Get the Java runtime
+        Runtime runtime = Runtime.getRuntime();
+        // Run the garbage collector
+        runtime.gc();
+        // Calculate the used memory
+        long memory = runtime.totalMemory() - runtime.freeMemory();
+        System.out.println("Used memory is bytes: " + memory);
+        System.out.println("Used memory is megabytes: " + bytesToMegabytes(memory));
+        
+        
+        String[] games = new String[]{"bait", "brainman",
+                "modality", "realsokoban", "thecitadel", "zenpuzzle"};
+       
+      //2- PLay a series of games and store results
+//        int L = 5;
+//        for (int g = 0; g < games.length; g++) {
+//            game_desc = gvgaiGames + games[g]+".txt";
+//            for (int l = 0; l < L; l++) {
+//            	 level_desc = gvgaiGames + games[g]+"_lvl"+l+".txt";
+//            	 GameResults results = GamePlayer.playGame(game_desc, level_desc, puzzleController, false);
+//                 IO.storeString(results.toString(), dataFolder, games[g] + "_lvl"+ l + "_results");
+//			}
+//		}
+        
+        
     }
 	
 	
