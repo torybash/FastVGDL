@@ -6,6 +6,7 @@ import fastVGDL.ontology.Types.ACTIONS;
 import fastVGDL.ontology.core.Sprite;
 import fastVGDL.parsing.core.SpriteGroup;
 import fastVGDL.parsing.core.VGDLRegistry;
+import java.util.Iterator;
 
 public class ForwardModel extends Game{
 
@@ -40,6 +41,39 @@ public class ForwardModel extends Game{
 				
 			}
 		}
+		
+		r = game.r;
+//                spriteGroups = new SpriteGroup[game.spriteGroups.length];
+//        num_sprites = 0;
+
+//        for(int i = 0; i < spriteGroups.length; ++i)
+//        {
+////            bucketList[i] = new Bucket();
+//            spriteGroups[i] = new SpriteGroup(i);
+//
+//            Iterator<Sprite> spriteIt = game.spriteGroups[i].getSpriteIterator();
+//            if(spriteIt != null) while(spriteIt.hasNext())
+//            {
+//                Sprite sp = spriteIt.next();
+//                Sprite spCopy = sp.copy();
+//                spriteGroups[i].sprites.put(spCopy.groupId, spCopy);
+////                spriteGroups[i].addSprite(spCopy.id, spCopy);
+////                checkSpriteFeatures(spCopy, i);
+////                updateObservation(spCopy);
+////			if (game.spriteGroups[i].isAvatar && game.spriteGroups[i].sprites.size() > 0){
+//////				for (Sprite sp :  spriteGroups[i].sprites.values()) {
+////					avatarSprite = sp;
+////					break;
+//////				}
+////				
+////			}
+//            }
+//            System.out.println("avatarSprite: " + avatarSprite);
+//            
+//            System.out.println("spriteGroups[i].isAvatar: " + game.spriteGroups[i].isAvatar);
+////            int nSprites = spriteGroups[i].numSprites();
+////            num_sprites += nSprites;
+//        }
 		
 		visuals = false;
 	}

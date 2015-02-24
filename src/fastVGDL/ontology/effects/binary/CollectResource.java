@@ -1,9 +1,9 @@
 package fastVGDL.ontology.effects.binary;
 
+import fastVGDL.core.game.Game;
 import fastVGDL.ontology.core.Sprite;
 import fastVGDL.ontology.effects.Interaction;
-import fastVGDL.parsing.core.Node;
-import fastVGDL.core.game.Game;
+import fastVGDL.ontology.sprites.Resource;
 
 /**
  * Created with IntelliJ IDEA.
@@ -23,15 +23,15 @@ public class CollectResource extends Interaction
     public void execute(Sprite sprite1, Sprite sprite2, Game game) {
 
     	super.hasInteracted(sprite1, sprite2);
-//        if(sprite1.is_resource)
-//        {
-//            Resource r = (Resource) sprite1;
-//
-//            int numResources = sprite2.getAmountResource(r.resource_type);
-//            if(numResources + r.value <= game.getResourceLimit(r.resource_type))
-//            {
-//                sprite2.modifyResource(r.resource_type, r.value);
-//            }
-//        }
+        if(sprite1.isResource)
+        {
+            Resource r = (Resource) sprite1;
+
+            int numResources = sprite2.getAmountResource(r.resource_type);
+            if(numResources + r.value <= game.getResourceLimit(r.resource_type))
+            {
+                sprite2.modifyResource(r.resource_type, r.value);
+            }
+        }
     }
 }

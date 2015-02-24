@@ -1,5 +1,6 @@
-package fastVGDL.controllers.puzzleSolverPlus;
+package fastVGDL.controllers.puzzleSolverPlusLowMem;
 
+import fastVGDL.controllers.puzzleSolverPlus.*;
 import fastVGDL.tools.Vector2i;
 
 public class Moveable {

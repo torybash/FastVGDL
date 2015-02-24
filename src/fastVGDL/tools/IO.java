@@ -1,7 +1,10 @@
 package fastVGDL.tools;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
 /**
@@ -60,5 +63,23 @@ public class IO
             return null;
         }
         return res;
+    }
+    
+    
+    public static void storeString(String game_desc, String folderPath, String title){
+        String[] lines = game_desc.split("\\n");
+        PrintWriter writer;
+        String path = folderPath + title + ".txt";
+        try {
+            writer = new PrintWriter(path, "UTF-8");
+            for (int i = 0; i < lines.length; i++) {
+                    writer.println(lines[i]);
+            }
+            writer.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
     }
 }

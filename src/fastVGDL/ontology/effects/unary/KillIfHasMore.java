@@ -3,6 +3,7 @@ package fastVGDL.ontology.effects.unary;
 import fastVGDL.ontology.core.Sprite;
 import fastVGDL.ontology.effects.Interaction;
 import fastVGDL.parsing.core.Node;
+import fastVGDL.parsing.core.VGDLRegistry;
 import fastVGDL.core.game.Game;
 
 /**
@@ -30,7 +31,9 @@ public class KillIfHasMore extends Interaction
     {
     	super.hasInteracted(sprite1, sprite2);
     	
-    	//        if(sprite1.getAmountResource(resourceId) >= limit)
-//            game.killSprite(sprite1);
+    	 resourceId = VGDLRegistry.GetInstance().getRegisteredSpriteId(resource);
+    	
+		if(sprite1.getAmountResource(resourceId) >= limit)
+        game.killSprite(sprite1);
     }
 }

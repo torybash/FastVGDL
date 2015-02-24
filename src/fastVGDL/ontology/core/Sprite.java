@@ -49,6 +49,8 @@ public abstract class Sprite {
     public boolean singleton;
     public int cooldown;
     
+    public boolean isResource = false;
+    
     public boolean hasInteracted = false;
     
     HashMap<Integer, Integer> resources = new HashMap<Integer, Integer>();
@@ -275,7 +277,9 @@ public abstract class Sprite {
 		targetSprite.isAvatar = isAvatar;
 		targetSprite.orientation = orientation;
 		targetSprite.color = color;
+		targetSprite.isResource = isResource;
 		targetSprite.hasInteracted = hasInteracted;
+		targetSprite.resources = (HashMap<Integer, Integer>) resources.clone();
 	}
 
 
@@ -359,6 +363,7 @@ public abstract class Sprite {
 //		System.out.println("want: " + resourceId);
 		if (resources.get(resourceId) == null) return 0;
 		return resources.get(resourceId);
+//            return 0;
 	}
 
 

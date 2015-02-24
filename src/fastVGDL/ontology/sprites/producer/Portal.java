@@ -1,5 +1,7 @@
 package fastVGDL.ontology.sprites.producer;
 
+import fastVGDL.ontology.core.Sprite;
+
 
 /**
  * Created with IntelliJ IDEA.
@@ -13,9 +15,10 @@ public class Portal extends SpriteProducer
     public String stype;
     public int itype;
 
+    
+    
     public Portal(){}
 
-//    public Portal(Vector2i position, Dimension size, SpriteContent cnt)
 //    {
 //        //Init the sprite
 //        this.init(position, size);
@@ -55,4 +58,22 @@ public class Portal extends SpriteProducer
 //        targetSprite.itype = this.itype;
 //        super.copyTo(targetSprite);
 //    }
+
+
+	public Sprite copy()
+	{
+	    Portal newSprite = new Portal();
+	    this.copyTo(newSprite);
+	    return newSprite;
+	}
+	
+	public void copyTo(Sprite target)
+	{
+		Portal targetSprite = (Portal) target;
+		targetSprite.stype = stype;
+		targetSprite.itype = itype;
+		
+	    super.copyTo(targetSprite);
+	}
+
 }

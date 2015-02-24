@@ -28,7 +28,7 @@ public class SpriteGroup
      * Collection of sprites. They are maintained in a TreeMap, where the key is the
      * unique identifier for the given sprite (in the whole game).
      */
-    public HashMap<Integer, Sprite> sprites;
+    public TreeMap<Integer, Sprite> sprites;
 
 	public boolean leafNode;
 	
@@ -41,13 +41,13 @@ public class SpriteGroup
     public SpriteGroup(int itype)
     {
         this.id = itype;
-        sprites = new HashMap<Integer, Sprite>();
+        sprites = new TreeMap<Integer, Sprite>();
     }
 
     public SpriteGroup(int id, ArrayList<Integer> childIds) {
 		this.id = id;
 		this.childIds = childIds;
-		sprites = new HashMap<Integer, Sprite>();
+		sprites = new TreeMap<Integer, Sprite>();
 	}
 
 	/**
@@ -76,7 +76,7 @@ public class SpriteGroup
      * Gets the collection of sprites, as a TreeMap [KEY => VALUE].
      * @return the TreeMap with the Sprites.
      */
-    public HashMap<Integer, Sprite> getSprites()
+    public TreeMap<Integer, Sprite> getSprites()
     {
         return sprites;
     }
@@ -168,11 +168,22 @@ public class SpriteGroup
 		result.leafNode = leafNode;
 		result.isAvatar = isAvatar;
 		
-		result.sprites = new HashMap<Integer, Sprite>();
-		for (Integer groupId : sprites.keySet()) {
-			Sprite sp = sprites.get(groupId).copy();
-		    result.sprites.put(groupId, sp);
-		}
+//		result.sprites = new TreeMap<Integer, Sprite>();
+//		for (Integer groupId : sprites.keySet()) {
+//			Sprite sp = sprites.get(groupId).copy();
+//		    result.sprites.put(groupId, sp);
+//		}
+                
+                Iterator<Sprite> spriteIt = getSpriteIterator();
+                if(spriteIt != null) while(spriteIt.hasNext())
+                {
+                    Sprite sp = spriteIt.next();
+                    Sprite spCopy = sp.copy();
+                    result.sprites.put(spCopy.groupId, spCopy);
+//                    checkSpriteFeatures(spCopy, i);
+//                    updateObservation(spCopy);
+                }
+                
 		result.idxIncrementer = idxIncrementer;
 
 		return result;

@@ -1,5 +1,6 @@
-package fastVGDL.controllers.puzzleSolverPlus;
+package fastVGDL.controllers.puzzleSolverPlusLowMem;
 
+import fastVGDL.controllers.puzzleSolverPlus.*;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -32,14 +33,14 @@ public class Agent extends AbstractPlayer{
     ArrayDeque<Node> q = new ArrayDeque<Node>();
     HashSet<Node> visitedNodes = new HashSet<Node>();
     
-    final int MAX_VISITED_NODES = 50000;
+    final int MAX_VISITED_NODES = 100000;
     final int MAX_QUEUE_SIZE = 2000000;
 	
     final boolean VERBOSE = false;
     final boolean LOOP_VERBOSE = false;
     
     final boolean depthFirst = false;
-    final boolean lowMemoryApproach = false;
+    final boolean lowMemoryApproach = true;
     final boolean findAllSolutions = false;
     
     boolean[] wallPositions;
@@ -134,9 +135,9 @@ public class Agent extends AbstractPlayer{
                 if (LOOP_VERBOSE){
                     System.out.println("Advancing with node: {action list: " + getActionList(n.list));
                 }
-            	currentState = n.getFwdModel();
-                if (currentState == null) currentState = playbackActions(fm, n.list);
-                else currentState.advance(actions[n.lastAction]);
+//            	currentState = n.getFwdModel();
+                currentState = playbackActions(fm, n.list);
+//                else currentState.advance(actions[n.lastAction]);
                 
                 
                 //if current state contains flickers, advance with nil action
@@ -248,7 +249,7 @@ public class Agent extends AbstractPlayer{
                             if (lowMemoryApproach){
                                 n_new = new Node(n.list, n.moveables, i);
                             }else{
-                                n_new = new Node(currentState.copy(), n.list, n.moveables, i);
+//                                n_new = new Node(currentState.copy(), n.list, n.moveables, i);
                             }
                             
                             if (depthFirst){
@@ -266,7 +267,7 @@ public class Agent extends AbstractPlayer{
                 visitedNodes.add(n);
             }
             
-            n.fwdModel = null;
+//            n.fwdModel = null;
         	        	
             if (!nodeAlreadyExists) numIters++;
             acumTimeTaken = (elapsedTimerIteration.elapsedMillis());

@@ -1,9 +1,12 @@
 package fastVGDL.ontology.effects.binary;
 
+import java.util.Collection;
+
+import fastVGDL.core.game.Game;
 import fastVGDL.ontology.core.Sprite;
 import fastVGDL.ontology.effects.Interaction;
-import fastVGDL.parsing.core.Node;
-import fastVGDL.core.game.Game;
+import fastVGDL.ontology.sprites.producer.Portal;
+import fastVGDL.parsing.core.VGDLRegistry;
 
 /**
  * Created with IntelliJ IDEA.
@@ -24,6 +27,25 @@ public class TeleportToExit extends Interaction
     {
     	super.hasInteracted(sprite1, sprite2);
 //        int destinationId = VGDLFactory.GetInstance().requestFieldValueInt(sprite2, "itype");
+    	
+    	//Get stype of sprite 2:
+    	Portal portal = (Portal) sprite2;
+    	String spType = portal.stype;
+
+    	int itype = VGDLRegistry.GetInstance().getRegisteredSpriteId(spType);
+    	
+    	//Get all sprites of stype:
+    	Collection<Sprite> sprites = game.spriteGroups[itype].sprites.values();
+    	if (sprites.size() > 0){
+//    		Sprite destination = (Sprite) sprites.toArray()[game.getRandomGenerator().nextInt(sprites.size())];
+    		Sprite destination = (Sprite) sprites.toArray()[0]; //<--- always taking the first -- random in puzzles is no good
+    		
+    		sprite1.position = destination.position.copy();
+    		
+    		sprite1.lastPosition = destination.position.copy();
+    	}
+
+//    	VGDLRegistry.GetInstance().getRegisteredSpriteId(stype)
 //
 //        Collection<VGDLSprite> sprites = game.getSprites(destinationId).values();
 //

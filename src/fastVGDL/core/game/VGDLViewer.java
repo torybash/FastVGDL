@@ -89,6 +89,7 @@ public class VGDLViewer extends JComponent
 			}
 		}
         
+        if (avatarGroupIdx == -1) return;
         SpriteGroup avatarSg = game.spriteGroups[avatarGroupIdx];
 		for (Integer id : avatarSg.sprites.keySet()) {
 			Sprite sp = avatarSg.sprites.get(id); 

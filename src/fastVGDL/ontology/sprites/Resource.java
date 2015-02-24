@@ -33,6 +33,8 @@ public class Resource extends Passive
 //
 //        //Parse the arguments.
 //        this.parseParameters(cnt);
+    	
+    	isResource = true;
 
     }
 

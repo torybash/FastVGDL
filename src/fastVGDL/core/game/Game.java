@@ -1,10 +1,10 @@
 package fastVGDL.core.game;
 
 import java.awt.Dimension;
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Random;
 
+import fastVGDL.core.player.AbstractPlayer;
 import fastVGDL.ontology.Types.ACTIONS;
 import fastVGDL.ontology.core.Sprite;
 import fastVGDL.ontology.core.SpriteDefinition;
@@ -15,7 +15,6 @@ import fastVGDL.parsing.core.SpriteGroup;
 import fastVGDL.tools.JEasyFrame;
 import fastVGDL.tools.KeyInput;
 import fastVGDL.tools.Vector2i;
-import fastVGDL.core.player.AbstractPlayer;
 
 public class Game {
 	public String gamePath = "";
@@ -47,7 +46,7 @@ public class Game {
 	protected int[] resources_limits;
 		
 	final int STANDARD_DELAY = 50;
-	final int MAX_GAME_TICKS = 2000000;
+	final int MAX_GAME_TICKS = 5000;
 	
 	public boolean won = false;
 	
@@ -63,6 +62,8 @@ public class Game {
 	public int numSpritesCreated = 0;
 
 	public int numberSpritesMoved;
+
+	Random r;
 	
 	public Game(){}
 	
@@ -508,6 +509,11 @@ public class Game {
 
 	public int getResourceLimit(int resourceId) {
 		return resources_limits[resourceId];
+	}
+
+	public Random getRandomGenerator() {
+		if (r == null) r = new Random();
+		return r;
 	}
 	
 }
